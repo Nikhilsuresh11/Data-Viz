@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Viz - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --accent-color: #81C784;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+        
+        .navbar {
+            background-color: var(--dark-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #343a40 100%);
+            color: white;
+            padding: 80px 0;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 40px;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .upload-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 50px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        footer {
+            background-color: var(--dark-bg);
+            color: white;
+            padding: 20px 0;
+            margin-top: 60px;
+        }
+        
+        /* Data preview modal styles */
+        .preview-modal .modal-dialog {
+            max-width: 90%;
+        }
+        
+        .preview-modal .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .preview-table th, .preview-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .preview-table th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+        
+        .preview-options {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        /* Tab styles */
+        .nav-tabs .nav-link {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            font-weight: 600;
+            border-color: #dee2e6 #dee2e6 #fff;
+        }
+        
+        /* URL input styles */
+        .url-input-container {
+            margin-top: 20px;
+        }
+        
+        /* Document upload styles */
+        .document-upload-container {
+            margin-top: 20px;
+        }
+        
+        .document-icon {
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+        
+        .progress {
+            height: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bar-chart-fill me-2"></i>
+                Data Viz
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    {% if session.get('file_path') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/explorer">Data Explorer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/visualizations">Visualizations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/insights">Insights</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom">Custom Charts</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="hero-title">Data Visualization Made Simple</h1>
+            <p class="hero-subtitle">Upload your data and get instant insights with intelligent visualizations</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-eye"></i>
+                    </div>
+                    <h3 class="feature-title">Overview</h3>
+                    <p>Get a comprehensive overview of your dataset with key metrics and statistics at a glance.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h3 class="feature-title">Data Explorer</h3>
+                    <p>Filter, sort, and slice your data to discover patterns and relationships between variables.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h3 class="feature-title">Visualizations</h3>
+                    <p>Automatically generated visualizations that highlight the most important aspects of your data.</p>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <h3 class="feature-title">Insights</h3>
+                    <p>Discover meaningful insights and patterns in your data through advanced analysis techniques.</p>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-palette"></i>
+                    </div>
+                    <h3 class="feature-title">Custom Charts</h3>
+                    <p>Create your own custom visualizations tailored to your specific needs and questions.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-container">
+            <h2 class="text-center mb-4">Upload Your Data</h2>
+            
+            <!-- Upload Tabs -->
+            <ul class="nav nav-tabs mb-4" id="uploadTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="csv-tab" data-bs-toggle="tab" data-bs-target="#csv-upload" type="button" role="tab">
+                        <i class="bi bi-file-earmark-spreadsheet me-1"></i>CSV/Excel
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="document-tab" data-bs-toggle="tab" data-bs-target="#document-upload" type="button" role="tab">
+                        <i class="bi bi-file-earmark-text me-1"></i>Document
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="url-tab" data-bs-toggle="tab" data-bs-target="#url-upload" type="button" role="tab">
+                        <i class="bi bi-globe me-1"></i>Website
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="uploadTabsContent">
+                <!-- CSV/Excel Upload Tab -->
+                <div class="tab-pane fade show active" id="csv-upload" role="tabpanel">
+                    <p class="text-center mb-4">Upload a CSV or Excel file to get started with your data analysis journey.</p>
+                    
+                    <form id="upload-form" enctype="multipart/form-data">
+                        <div class="upload-area" id="drop-area">
+                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                            <h4>Drag & Drop your file here</h4>
+                            <p>or</p>
+                            <input type="file" id="file-input" name="file" accept=".csv,.xlsx" class="d-none">
+                            <button type="button" class="btn btn-primary" id="browse-btn">Browse Files</button>
+                            <p class="mt-3 text-muted">Supported formats: CSV, Excel</p>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-5" id="upload-btn" disabled>
+                                <i class="bi bi-upload me-2"></i>Upload & Analyze
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="alert alert-danger mt-4 d-none" id="error-message"></div>
+                    <div class="progress mt-4 d-none" id="upload-progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- Document Upload Tab -->
+                <div class="tab-pane fade" id="document-upload" role="tabpanel">
+                    <p class="text-center mb-4">Extract tables from PDF, Word, or Excel documents.</p>
+                    
+                    <form id="document-upload-form" enctype="multipart/form-data">
+                        <div class="upload-area" id="document-drop-area">
+                            <i class="bi bi-file-earmark-text upload-icon"></i>
+                            <h4>Drag & Drop your document here</h4>
+                            <p>or</p>
+                            <input type="file" id="document-file-input" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx" class="d-none">
+                            <button type="button" class="btn btn-primary" id="document-browse-btn">Browse Files</button>
+                            <p class="mt-3 text-muted">Supported formats: PDF, Word, Excel</p>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-5" id="document-upload-btn" disabled>
+                                <i class="bi bi-search me-2"></i>Extract Tables
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="alert alert-danger mt-4 d-none" id="document-error-message"></div>
+                    <div class="progress mt-4 d-none" id="document-upload-progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    
+                    <!-- Extracted Tables Container -->
+                    <div id="extracted-tables-container" class="mt-4 d-none">
+                        <h4>Extracted Tables</h4>
+                        <div id="tables-list" class="row">
+                            <!-- Tables will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- URL Upload Tab -->
+                <div class="tab-pane fade" id="url-upload" role="tabpanel">
+                    <p class="text-center mb-4">Extract tables from a website by entering its URL.</p>
+                    
+                    <form id="url-form">
+                        <div class="mb-3">
+                            <label for="url-input" class="form-label">Website URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                                <input type="url" id="url-input" class="form-control" placeholder="https://example.com/table-page" required>
+                                <button type="submit" class="btn btn-primary">Extract Tables</button>
+                            </div>
+                            <div class="form-text">Enter the URL of a webpage containing tables you want to extract</div>
+                        </div>
+                    </form>
+                    
+                    <div class="alert alert-danger mt-4 d-none" id="url-error-message"></div>
+                    <div class="progress mt-4 d-none" id="url-progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    
+                    <!-- Extracted Tables Container -->
+                    <div id="url-tables-container" class="mt-4 d-none">
+                        <h4>Extracted Tables</h4>
+                        <div id="url-tables-list" class="row">
+                            <!-- Tables will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Preview Modal -->
+    <div class="modal fade preview-modal" id="dataPreviewModal" tabindex="-1" aria-labelledby="dataPreviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dataPreviewModalLabel">Data Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="preview-container">
+                        <!-- Preview table will be inserted here -->
+                    </div>
+                    <div class="preview-options">
+                        <h6>Data Processing Options</h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" value="" id="handleMissingValues" checked>
+                            <label class="form-check-label" for="handleMissingValues">
+                                Handle missing values
+                            </label>
+                            <small class="form-text text-muted d-block">Fill missing numeric values with median and categorical values with mode</small>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" value="" id="convertDateColumns" checked>
+                            <label class="form-check-label" for="convertDateColumns">
+                                Convert date columns
+                            </label>
+                            <small class="form-text text-muted d-block">Automatically detect and convert date columns to proper datetime format</small>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" value="" id="handleOutliers" checked>
+                            <label class="form-check-label" for="handleOutliers">
+                                Handle outliers
+                            </label>
+                            <small class="form-text text-muted d-block">Detect and cap extreme values using IQR method</small>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" value="" id="encodeCategorical">
+                            <label class="form-check-label" for="encodeCategorical">
+                                Encode categorical variables
+                            </label>
+                            <small class="form-text text-muted d-block">Convert categorical text columns to numeric using Label Encoding</small>
+                        </div>
+                        
+                        <!-- Add data statistics section -->
+                        <div class="mt-3 pt-3 border-top" id="data-stats-container">
+                            <h6>Data Statistics</h6>
+                            <div id="missing-values-stats"></div>
+                            <div id="categorical-columns-stats"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirm-upload-btn">
+                        <i class="bi bi-check-circle me-2"></i>Confirm & Analyze
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Preview Modal -->
+    <div class="modal fade" id="tablePreviewModal" tabindex="-1" aria-labelledby="tablePreviewModalLabel" aria-hidden="true">  id="tablePreviewModal" tabindex="-1" aria-labelledby="tablePreviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tablePreviewModalLabel">Table Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="table-preview-container">
+                        <!-- Table preview will be inserted here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="process-table-btn">
+                        <i class="bi bi-check-circle me-2"></i>Use This Table
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container text-center">
+            <p>© 2025 Data Viz. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // CSV/Excel Upload Functionality
+            const dropArea = document.getElementById('drop-area');
+            const fileInput = document.getElementById('file-input');
+            const browseBtn = document.getElementById('browse-btn');
+            const uploadBtn = document.getElementById('upload-btn');
+            const uploadForm = document.getElementById('upload-form');
+            const errorMessage = document.getElementById('error-message');
+            const uploadProgress = document.getElementById('upload-progress');
+            const progressBar = uploadProgress.querySelector('.progress-bar');
+            
+            // Preview modal elements
+            const dataPreviewModal = new bootstrap.Modal(document.getElementById('dataPreviewModal'));
+            const previewContainer = document.getElementById('preview-container');
+            const confirmUploadBtn = document.getElementById('confirm-upload-btn');
+            const handleMissingValues = document.getElementById('handleMissingValues');
+            const convertDateColumns = document.getElementById('convertDateColumns');
+            const handleOutliers = document.getElementById('handleOutliers');
+            const encodeCategorical = document.getElementById('encodeCategorical');
+            
+            // Browse button click
+            browseBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // File selected
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    uploadBtn.disabled = false;
+                    dropArea.innerHTML = `
+                        <i class="bi bi-file-earmark-check upload-icon"></i>
+                        <h4>${fileInput.files[0].name}</h4>
+                        <p class="text-muted">${(fileInput.files[0].size / 1024 / 1024).toFixed(2)} MB</p>
+                        <button type="button" class="btn btn-outline-secondary mt-2" id="change-file-btn">
+                            <i class="bi bi-arrow-repeat me-2"></i>Change File
+                        </button>
+                    `;
+                    
+                    document.getElementById('change-file-btn').addEventListener('click', () => {
+                        fileInput.value = '';
+                        uploadBtn.disabled = true;
+                        dropArea.innerHTML = `
+                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                            <h4>Drag & Drop your file here</h4>
+                            <p>or</p>
+                            <input type="file" id="file-input" name="file" accept=".csv,.xlsx" class="d-none">
+                            <button type="button" class="btn btn-primary" id="browse-btn">Browse Files</button>
+                            <p class="mt-3 text-muted">Supported formats: CSV, Excel</p>
+                        `;
+                        document.getElementById('browse-btn').addEventListener('click', () => {
+                            fileInput.click();
+                        });
+                    });
+                }
+            });
+            
+            // Drag and drop events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.classList.add('dragover');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('dragover');
+            }
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    uploadBtn.disabled = false;
+                    dropArea.innerHTML = `
+                        <i class="bi bi-file-earmark-check upload-icon"></i>
+                        <h4>${files[0].name}</h4>
+                        <p class="text-muted">${(files[0].size / 1024 / 1024).toFixed(2)} MB</p>
+                        <button type="button" class="btn btn-outline-secondary mt-2" id="change-file-btn">
+                            <i class="bi bi-arrow-repeat me-2"></i>Change File
+                        </button>
+                    `;
+                    
+                    document.getElementById('change-file-btn').addEventListener('click', () => {
+                        fileInput.value = '';
+                        uploadBtn.disabled = true;
+                        dropArea.innerHTML = `
+                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                            <h4>Drag & Drop your file here</h4>
+                            <p>or</p>
+                            <input type="file" id="file-input" name="file" accept=".csv,.xlsx" class="d-none">
+                            <button type="button" class="btn btn-primary" id="browse-btn">Browse Files</button>
+                            <p class="mt-3 text-muted">Supported formats: CSV, Excel</p>
+                        `;
+                        document.getElementById('browse-btn').addEventListener('click', () => {
+                            fileInput.click();
+                        });
+                    });
+                }
+            }
+            
+            // Form submission
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!fileInput.files.length) {
+                    showError('Please select a file to upload');
+                    return;
+                }
+                
+                const file = fileInput.files[0];
+                const fileExt = file.name.split('.').pop().toLowerCase();
+                
+                if (!['csv', 'xlsx'].includes(fileExt)) {
+                    showError('Please upload a CSV or Excel file');
+                    return;
+                }
+                
+                // Hide error message if previously shown
+                errorMessage.classList.add('d-none');
+                
+                // Show progress bar
+                uploadProgress.classList.remove('d-none');
+                progressBar.style.width = '0%';
+                progressBar.textContent = '0%';
+                
+                // Create FormData
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('preview', 'true'); // Request preview only
+                
+                // Upload file for preview
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressBar.style.width = percentComplete + '%';
+                        progressBar.textContent = Math.round(percentComplete) + '%';
+                    }
+                });
+                
+                xhr.addEventListener('load', function() {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.success) {
+                                // Show data preview
+                                showDataPreview(response.preview, response.session_id, response.total_rows || 0, response.data_stats);
+                            } else if (response.error) {
+                                showError(response.error);
+                            }
+                        } catch (e) {
+                            showError('Invalid response from server. Please try again.');
+                        }
+                    } else {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.error) {
+                                showError(response.error);
+                            } else {
+                                showError('Upload failed with status: ' + xhr.status);
+                            }
+                        } catch (e) {
+                            showError('Upload failed. Please try again.');
+                        }
+                    }
+                    uploadProgress.classList.add('d-none');
+                });
+                
+                xhr.addEventListener('error', function() {
+                    showError('Network error occurred. Please try again.');
+                    uploadProgress.classList.add('d-none');
+                });
+                
+                xhr.addEventListener('abort', function() {
+                    showError('Upload aborted. Please try again.');
+                    uploadProgress.classList.add('d-none');
+                });
+                
+                xhr.open('POST', '/upload-preview', true);
+                xhr.send(formData);
+            });
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('d-none');
+                uploadProgress.classList.add('d-none');
+            }
+            
+            // Update the showDataPreview function to display data statistics
+            function showDataPreview(previewData, sessionId, totalRows, dataStats) {
+                // Create preview table
+                let tableHtml = '<div class="table-responsive"><table class="table table-striped preview-table">';
+                
+                // Add header row
+                tableHtml += '<thead><tr>';
+                previewData.columns.forEach(column => {
+                    tableHtml += `<th>${column}</th>`;
+                });
+                tableHtml += '</tr></thead>';
+                
+                // Add data rows
+                tableHtml += '<tbody>';
+                previewData.data.forEach(row => {
+                    tableHtml += '<tr>';
+                    row.forEach(cell => {
+                        tableHtml += `<td>${cell !== null ? cell : '<span class="text-muted">null</span>'}</td>`;
+                    });
+                    tableHtml += '</tr>';
+                });
+                tableHtml += '</tbody></table></div>';
+                
+                // Add dataset info
+                if (totalRows > 0) {
+                    tableHtml += `<div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Preview showing 10 of ${totalRows.toLocaleString()} total rows
+                    </div>`;
+                }
+                
+                // Update preview container
+                previewContainer.innerHTML = tableHtml;
+                
+                // Store session ID for later use
+                confirmUploadBtn.dataset.sessionId = sessionId;
+                
+                // Update data statistics if available
+                if (dataStats) {
+                    // Missing values stats
+                    const missingValuesStats = document.getElementById('missing-values-stats');
+                    if (missingValuesStats && dataStats.missing_values) {
+                        let missingHtml = '<div class="mt-2"><strong>Missing Values:</strong>';
+                        
+                        const missingColumns = Object.entries(dataStats.missing_values)
+                            .filter(([_, count]) => count > 0)
+                            .sort((a, b) => b[1] - a[1]);
+                        
+                        if (missingColumns.length > 0) {
+                            missingHtml += '<ul class="list-group list-group-flush small">';
+                            missingColumns.slice(0, 5).forEach(([col, count]) => {
+                                missingHtml += `<li class="list-group-item d-flex justify-content-between align-items-center py-1">
+                                    ${col}
+                                    <span class="badge bg-warning text-dark">${count} missing</span>
+                                </li>`;
+                            });
+                            if (missingColumns.length > 5) {
+                                missingHtml += `<li class="list-group-item py-1 text-center">
+                                    <small>And ${missingColumns.length - 5} more columns with missing values</small>
+                                </li>`;
+                            }
+                            missingHtml += '</ul>';
+                        } else {
+                            missingHtml += '<p class="text-success small mt-1"><i class="bi bi-check-circle me-1"></i>No missing values detected</p>';
+                        }
+                        
+                        missingHtml += '</div>';
+                        missingValuesStats.innerHTML = missingHtml;
+                    }
+                    
+                    // Categorical columns stats
+                    const categoricalColumnsStats = document.getElementById('categorical-columns-stats');
+                    if (categoricalColumnsStats && dataStats.categorical_columns) {
+                        let catHtml = '<div class="mt-3"><strong>Categorical Columns:</strong>';
+                        
+                        if (dataStats.categorical_columns.length > 0) {
+                            catHtml += '<p class="small mt-1">';
+                            dataStats.categorical_columns.slice(0, 5).forEach((col, index) => {
+                                catHtml += `<span class="badge bg-info text-dark me-1">${col}</span>`;
+                            });
+                            if (dataStats.categorical_columns.length > 5) {
+                                catHtml += `<span class="small">and ${dataStats.categorical_columns.length - 5} more</span>`;
+                            }
+                            catHtml += '</p>';
+                        } else {
+                            catHtml += '<p class="text-muted small mt-1">No categorical columns detected</p>';
+                        }
+                        
+                        catHtml += '</div>';
+                        categoricalColumnsStats.innerHTML = catHtml;
+                    }
+                }
+                
+                // Show preview modal
+                dataPreviewModal.show();
+                
+                // Handle confirm button
+                confirmUploadBtn.onclick = function() {
+                    const processingOptions = {
+                        handleMissingValues: handleMissingValues.checked,
+                        convertDateColumns: convertDateColumns.checked,
+                        handleOutliers: handleOutliers.checked,
+                        encodeCategorical: encodeCategorical.checked
+                    };
+                    
+                    // Show processing message
+                    previewContainer.innerHTML += `
+                        <div class="alert alert-warning mt-3">
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm me-2" role="status">
+                                    <span class="visually-hidden">Processing...</span>
+                                </div>
+                                <div>Processing your data. This may take a moment for large files...</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Disable confirm button
+                    confirmUploadBtn.disabled = true;
+                    
+                    // Send confirmation to server
+                    fetch('/confirm-upload', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            sessionId: this.dataset.sessionId,
+                            processingOptions: processingOptions
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.redirect) {
+                            window.location.href = data.redirect;
+                        } else {
+                            showError(data.error || 'Failed to process the file');
+                            dataPreviewModal.hide();
+                            confirmUploadBtn.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        showError('Error: ' + error.message);
+                        dataPreviewModal.hide();
+                        confirmUploadBtn.disabled = false;
+                    });
+                };
+            }
+            
+            // Update the xhr.addEventListener('load') in the form submission handler
+            xhr.addEventListener('load', function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            // Show data preview
+                            showDataPreview(response.preview, response.session_id, response.total_rows || 0, response.data_stats);
+                        } else if (response.error) {
+                            showError(response.error);
+                        }
+                    } catch (e) {
+                        showError('Invalid response from server. Please try again.');
+                    }
+                } else {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.error) {
+                            showError(response.error);
+                        } else {
+                            showError('Upload failed with status: ' + xhr.status);
+                        }
+                    } catch (e) {
+                        showError('Upload failed. Please try again.');
+                    }
+                }
+                uploadProgress.classList.add('d-none');
+            });
+            
+            // Document Upload Functionality
+            const documentDropArea = document.getElementById('document-drop-area');
+            const documentFileInput = document.getElementById('document-file-input');
+            const documentBrowseBtn = document.getElementById('document-browse-btn');
+            const documentUploadBtn = document.getElementById('document-upload-btn');
+            const documentUploadForm = document.getElementById('document-upload-form');
+            const documentErrorMessage = document.getElementById('document-error-message');
+            const documentUploadProgress = document.getElementById('document-upload-progress');
+            const documentProgressBar = documentUploadProgress.querySelector('.progress-bar');
+            const extractedTablesContainer = document.getElementById('extracted-tables-container');
+            const tablesList = document.getElementById('tables-list');
+            
+            // Table preview modal elements
+            const tablePreviewModal = new bootstrap.Modal(document.getElementById('tablePreviewModal'));
+            const tablePreviewContainer = document.getElementById('table-preview-container');
+            const processTableBtn = document.getElementById('process-table-btn');
+            
+            // Document browse button click
+            documentBrowseBtn.addEventListener('click', () => {
+                documentFileInput.click();
+            });
+            
+            // Document file selected
+            documentFileInput.addEventListener('change', () => {
+                if (documentFileInput.files.length > 0) {
+                    documentUploadBtn.disabled = false;
+                    documentDropArea.innerHTML = `
+                        <i class="bi bi-file-earmark-check upload-icon"></i>
+                        <h4>${documentFileInput.files[0].name}</h4>
+                        <p class="text-muted">${(documentFileInput.files[0].size / 1024 / 1024).toFixed(2)} MB</p>
+                        <button type="button" class="btn btn-outline-secondary mt-2" id="document-change-file-btn">
+                            <i class="bi bi-arrow-repeat me-2"></i>Change File
+                        </button>
+                    `;
+                    
+                    document.getElementById('document-change-file-btn').addEventListener('click', () => {
+                        documentFileInput.value = '';
+                        documentUploadBtn.disabled = true;
+                        documentDropArea.innerHTML = `
+                            <i class="bi bi-file-earmark-text upload-icon"></i>
+                            <h4>Drag & Drop your document here</h4>
+                            <p>or</p>
+                            <input type="file" id="document-file-input" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx" class="d-none">
+                            <button type="button" class="btn btn-primary" id="document-browse-btn">Browse Files</button>
+                            <p class="mt-3 text-muted">Supported formats: PDF, Word, Excel</p>
+                        `;
+                        document.getElementById('document-browse-btn').addEventListener('click', () => {
+                            documentFileInput.click();
+                        });
+                    });
+                }
+            });
+            
+            // Document drag and drop events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                documentDropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                documentDropArea.addEventListener(eventName, function() {
+                    documentDropArea.classList.add('dragover');
+                }, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                documentDropArea.addEventListener(eventName, function() {
+                    documentDropArea.classList.remove('dragover');
+                }, false);
+            });
+            
+            documentDropArea.addEventListener('drop', function(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    documentFileInput.files = files;
+                    documentUploadBtn.disabled = false;
+                    documentDropArea.innerHTML = `
+                        <i class="bi bi-file-earmark-check upload-icon"></i>
+                        <h4>${files[0].name}</h4>
+                        <p class="text-muted">${(files[0].size / 1024 / 1024).toFixed(2)} MB</p>
+                        <button type="button" class="btn btn-outline-secondary mt-2" id="document-change-file-btn">
+                            <i class="bi bi-arrow-repeat me-2"></i>Change File
+                        </button>
+                    `;
+                    
+                    document.getElementById('document-change-file-btn').addEventListener('click', () => {
+                        documentFileInput.value = '';
+                        documentUploadBtn.disabled = true;
+                        documentDropArea.innerHTML = `
+                            <i class="bi bi-file-earmark-text upload-icon"></i>
+                            <h4>Drag & Drop your document here</h4>
+                            <p>or</p>
+                            <input type="file" id="document-file-input" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx" class="d-none">
+                            <button type="button" class="btn btn-primary" id="document-browse-btn">Browse Files</button>
+                            <p class="mt-3 text-muted">Supported formats: PDF, Word, Excel</p>
+                        `;
+                        document.getElementById('document-browse-btn').addEventListener('click', () => {
+                            documentFileInput.click();
+                        });
+                    });
+                }
+            }, false);
+            
+            // Document form submission
+            documentUploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!documentFileInput.files.length) {
+                    showDocumentError('Please select a file to upload');
+                    return;
+                }
+                
+                const file = documentFileInput.files[0];
+                const fileExt = file.name.split('.').pop().toLowerCase();
+                
+                if (!['pdf', 'doc', 'docx', 'xls', 'xlsx'].includes(fileExt)) {
+                    showDocumentError('Please upload a PDF, Word, or Excel file');
+                    return;
+                }
+                
+                // Hide error message if previously shown
+                documentErrorMessage.classList.add('d-none');
+                
+                // Show progress bar
+                documentUploadProgress.classList.remove('d-none');
+                documentProgressBar.style.width = '0%';
+                documentProgressBar.textContent = '0%';
+                
+                // Create FormData
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // Upload file for table extraction
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        documentProgressBar.style.width = percentComplete + '%';
+                        documentProgressBar.textContent = Math.round(percentComplete) + '%';
+                    }
+                });
+                
+                xhr.addEventListener('load', function() {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.success) {
+                                // Show extracted tables
+                                showExtractedTables(response.tables);
+                            } else if (response.error) {
+                                showDocumentError(response.error);
+                            }
+                        } catch (e) {
+                            showDocumentError('Invalid response from server. Please try again.');
+                        }
+                    } else {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.error) {
+                                showDocumentError(response.error);
+                            } else {
+                                showDocumentError('Upload failed with status: ' + xhr.status);
+                            }
+                        } catch (e) {
+                            showDocumentError('Upload failed. Please try again.');
+                        }
+                    }
+                    documentUploadProgress.classList.add('d-none');
+                });
+                
+                xhr.addEventListener('error', function() {
+                    showDocumentError('Network error occurred. Please try again.');
+                    documentUploadProgress.classList.add('d-none');
+                });
+                
+                xhr.addEventListener('abort', function() {
+                    showDocumentError('Upload aborted. Please try again.');
+                    documentUploadProgress.classList.add('d-none');
+                });
+                
+                xhr.open('POST', '/extract-tables-from-document', true);
+                xhr.send(formData);
+            });
+            
+            function showDocumentError(message) {
+                documentErrorMessage.textContent = message;
+                documentErrorMessage.classList.remove('d-none');
+                documentUploadProgress.classList.add('d-none');
+            }
+            
+            function showExtractedTables(tables) {
+                // Clear previous tables
+                tablesList.innerHTML = '';
+                
+                // Add tables to the list
+                tables.forEach((table, index) => {
+                    const tableCard = document.createElement('div');
+                    tableCard.className = 'col-md-6 mb-3';
+                    tableCard.innerHTML = `
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">${table.title}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Columns:</strong> ${table.headers.length}</p>
+                                <p><strong>Rows:</strong> ${table.data.length}</p>
+                                <button class="btn btn-primary preview-table-btn" data-index="${index}">
+                                    <i class="bi bi-eye me-1"></i>Preview
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    tablesList.appendChild(tableCard);
+                });
+                
+                // Show tables container
+                extractedTablesContainer.classList.remove('d-none');
+                
+                // Add event listeners to preview buttons
+                document.querySelectorAll('.preview-table-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const tableIndex = this.dataset.index;
+                        previewTable(tables[tableIndex], tableIndex);
+                    });
+                });
+            }
+            
+            function previewTable(table, index) {
+                // Create preview table
+                let tableHtml = '<div class="table-responsive"><table class="table table-striped">';
+                
+                // Add header row
+                tableHtml += '<thead><tr>';
+                table.headers.forEach(header => {
+                    tableHtml += `<th>${header}</th>`;
+                });
+                tableHtml += '</tr></thead>';
+                
+                // Add data rows
+                tableHtml += '<tbody>';
+                table.data.forEach(row => {
+                    tableHtml += '<tr>';
+                    row.forEach(cell => {
+                        tableHtml += `<td>${cell !== null ? cell : '<span class="text-muted">null</span>'}</td>`;
+                    });
+                    tableHtml += '</tr>';
+                });
+                tableHtml += '</tbody></table></div>';
+                
+                // Update preview container
+                tablePreviewContainer.innerHTML = tableHtml;
+                
+                // Update modal title
+                document.getElementById('tablePreviewModalLabel').textContent = table.title;
+                
+                // Store table index for later use
+                processTableBtn.dataset.tableIndex = index;
+                processTableBtn.dataset.sessionId = table.sessionId;
+                
+                // Show preview modal
+                tablePreviewModal.show();
+                
+                // Handle process button
+                processTableBtn.onclick = function() {
+                    const tableIndex = this.dataset.tableIndex;
+                    const sessionId = this.dataset.sessionId;
+                    
+                    // Process the selected table
+                    fetch('/process-selected-table', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            tableIndex: tableIndex,
+                            sessionId: sessionId
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            showDocumentError(data.error);
+                            tablePreviewModal.hide();
+                        } else {
+                            // Redirect to overview page
+                            window.location.href = '/overview';
+                        }
+                    })
+                    .catch(error => {
+                        showDocumentError('Error: ' + error.message);
+                        tablePreviewModal.hide();
+                    });
+                };
+            }
+            
+            // URL Extraction Functionality
+            const urlForm = document.getElementById('url-form');
+            const urlInput = document.getElementById('url-input');
+            const urlErrorMessage = document.getElementById('url-error-message');
+            const urlProgress = document.getElementById('url-progress');
+            const urlProgressBar = urlProgress.querySelector('.progress-bar');
+            const urlTablesContainer = document.getElementById('url-tables-container');
+            const urlTablesList = document.getElementById('url-tables-list');
+            
+            // URL form submission
+            urlForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const url = urlInput.value.trim();
+                
+                if (!url) {
+                    showUrlError('Please enter a URL');
+                    return;
+                }
+                
+                // Hide error message if previously shown
+                urlErrorMessage.classList.add('d-none');
+                
+                // Show progress bar
+                urlProgress.classList.remove('d-none');
+                urlProgressBar.style.width = '100%';
+                
+                // Extract tables from URL
+                fetch('/extract-tables-from-url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: url }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show extracted tables
+                        showUrlExtractedTables(data.tables);
+                    } else if (data.error) {
+                        showUrlError(data.error);
+                    }
+                    urlProgress.classList.add('d-none');
+                })
+                .catch(error => {
+                    showUrlError('Error: ' + error.message);
+                    urlProgress.classList.add('d-none');
+                });
+            });
+            
+            function showUrlError(message) {
+                urlErrorMessage.textContent = message;
+                urlErrorMessage.classList.remove('d-none');
+                urlProgress.classList.add('d-none');
+            }
+            
+            function showUrlExtractedTables(tables) {
+                // Clear previous tables
+                urlTablesList.innerHTML = '';
+                
+                // Add tables to the list
+                tables.forEach((table, index) => {
+                    const tableCard = document.createElement('div');
+                    tableCard.className = 'col-md-6 mb-3';
+                    tableCard.innerHTML = `
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">${table.title}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Columns:</strong> ${table.headers.length}</p>
+                                <p><strong>Rows:</strong> ${table.data.length}</p>
+                                <button class="btn btn-primary url-preview-table-btn" data-index="${index}">
+                                    <i class="bi bi-eye me-1"></i>Preview
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    urlTablesList.appendChild(tableCard);
+                });
+                
+                // Show tables container
+                urlTablesContainer.classList.remove('d-none');
+                
+                // Add event listeners to preview buttons
+                document.querySelectorAll('.url-preview-table-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const tableIndex = this.dataset.index;
+                        previewTable(tables[tableIndex], tableIndex);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

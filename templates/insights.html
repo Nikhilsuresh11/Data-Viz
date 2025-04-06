@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Viz - Insights</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --accent-color: #81C784;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+        
+        .navbar {
+            background-color: var(--dark-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--dark-bg);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .insight-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .insight-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+        
+        .correlation-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .correlation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .correlation-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .correlation-label {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .target-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .target-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .target-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        /* Chat styles */
+        .chat-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background-color: var(--dark-bg);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 10px;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .bot-message {
+            align-self: flex-start;
+            background-color: #e9ecef;
+            color: var(--text-color);
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .chat-input input {
+            flex-grow: 1;
+            border-radius: 20px;
+            border: 1px solid #ced4da;
+            padding: 10px 15px;
+            margin-right: 10px;
+        }
+        
+        .chat-input button {
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bar-chart-fill me-2"></i>
+                Data Viz
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/explorer">Data Explorer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/visualizations">Visualizations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/insights">Insights</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom">Custom Charts</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+    <h1 class="mb-4">Data Insights</h1>
+    
+    <div class="row">
+        <!-- Chatbot Section - Now half-page sized -->
+        <div class="col-md-6">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <i class="bi bi-chat-dots me-2"></i>
+                    Data Assistant
+                </div>
+                <div class="chat-messages" id="chat-messages" style="height: 600px;">
+                    <div class="message bot-message">
+                        Hello! I'm your data assistant. Ask me anything about your dataset and I'll try to help you understand it better.
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input" placeholder="Ask a question about your data...">
+                    <button class="btn btn-primary" id="send-button">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Dataset Info -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Dataset Information
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        This information is used by the AI assistant to answer your questions.
+                    </p>
+                    <pre class="bg-light p-3 rounded" style="font-size: 0.8rem; max-height: 200px; overflow-y: auto;">{{ df_info }}</pre>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Insights Section -->
+        <div class="col-md-6">
+            <!-- Key Insights -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    Key Insights
+                </div>
+                <div class="card-body">
+                    {% for insight in insights %}
+                    <div class="insight-card">
+                        <i class="bi bi-arrow-right-circle insight-icon"></i>
+                        {{ insight }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Correlations -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-link-45deg me-2"></i>
+                    Top Correlations
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if top_correlations %}
+                            {% for (col1, col2), corr_value in top_correlations %}
+                            <div class="col-md-6 mb-3">
+                                <div class="correlation-card">
+                                    <div class="correlation-value">{{ corr_value|round(2) }}</div>
+                                    <div class="correlation-label">{{ col1 }} & {{ col2 }}</div>
+                                    <p class="text-muted mt-2">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        {% if corr_value > 0.8 %}
+                                        Very strong correlation
+                                        {% elif corr_value > 0.6 %}
+                                        Strong correlation
+                                        {% else %}
+                                        Moderate correlation
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    No significant correlations found in the dataset.
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Potential Targets -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="bi bi-bullseye me-2"></i>
+                    Potential Target Variables
+                </div>
+                <div class="card-body">
+                    <p>These columns might be good prediction targets for machine learning models:</p>
+                    <div class="row">
+                        {% if potential_targets %}
+                            {% for target in potential_targets[:5] %}
+                            <div class="col-md-6 mb-3">
+                                <div class="target-card text-center">
+                                    <i class="bi bi-bullseye target-icon"></i>
+                                    <h4>{{ target }}</h4>
+                                    <a href="/custom?target={{ target }}" class="btn btn-primary mt-3">
+                                        <i class="bi bi-graph-up me-2"></i>Analyze
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    No potential target variables identified.
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chat-messages');
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            
+            // Send message when button is clicked
+            sendButton.addEventListener('click', sendMessage);
+            
+            // Send message when Enter key is pressed
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (!message) return;
+                
+                // Add user message to chat
+                addMessage(message, 'user');
+                
+                // Clear input
+                chatInput.value = '';
+                
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'message bot-message';
+                typingIndicator.id = 'typing-indicator';
+                typingIndicator.innerHTML = '<div class="spinner-border spinner-border-sm text-secondary" role="status"><span class="visually-hidden">Loading...</span></div> Thinking...';
+                chatMessages.appendChild(typingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Send message to server
+                fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: message }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove typing indicator
+                    const indicator = document.getElementById('typing-indicator');
+                    if (indicator) {
+                        chatMessages.removeChild(indicator);
+                    }
+                    
+                    if (data.success) {
+                        // Add bot response to chat
+                        addMessage(data.response, 'bot');
+                    } else {
+                        // Add error message
+                        addMessage('Sorry, I encountered an error: ' + data.error, 'bot');
+                    }
+                })
+                .catch(error => {
+                    // Remove typing indicator
+                    const indicator = document.getElementById('typing-indicator');
+                    if (indicator) {
+                        chatMessages.removeChild(indicator);
+                    }
+                    
+                    // Add error message
+                    addMessage('Sorry, there was an error processing your request.', 'bot');
+                    console.error('Error:', error);
+                });
+            }
+            
+            function addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                messageDiv.textContent = text;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Viz - Overview</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --accent-color: #81C784;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+        
+        .navbar {
+            background-color: var(--dark-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            background-color: var(--dark-bg);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .metric-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .metric-label {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .insight-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .insight-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+        
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        
+        .progress-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .progress {
+            height: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            background-color: var(--primary-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        /* LLM Chart Ideas */
+        .chart-idea-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .chart-idea-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chart-idea-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-bg);
+        }
+        
+        .chart-idea-type {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .chart-idea-description {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        .chart-idea-columns {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        /* Data quality score */
+        .quality-score {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+        }
+        
+        .quality-score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        /* Dataset summary */
+        .dataset-summary {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .summary-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .summary-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+        
+        /* Preprocessing info */
+        .preprocessing-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .preprocessing-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bar-chart-fill me-2"></i>
+                Data Viz
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/explorer">Data Explorer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/visualizations">Visualizations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/insights">Insights</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom">Custom Charts</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Add this section near the top of your overview.html template -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Dataset Overview</h1>
+            <a href="/download-processed-data" class="btn btn-success">
+                <i class="bi bi-download me-2"></i>Download Processed Data
+            </a>
+        </div>
+        
+        <!-- Dataset Summary Card -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="bi bi-info-circle me-2"></i>
+                    Dataset Summary
+                </div>
+                <span class="badge bg-primary">{{ session.get('original_filename', '').split('.')[-1].upper() }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="dataset-summary">
+                            <div class="summary-item">
+                                <div class="summary-icon">
+                                    <i class="bi bi-table"></i>
+                                </div>
+                                <div>
+                                    <strong>Dimensions:</strong> {{ rows }} rows × {{ columns }} columns
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-icon">
+                                    <i class="bi bi-bar-chart"></i>
+                                </div>
+                                <div>
+                                    <strong>Column Types:</strong> 
+                                    {{ col_type_counts.get('numeric', 0) }} numeric, 
+                                    {{ col_type_counts.get('categorical', 0) }} categorical,
+                                    {{ col_type_counts.get('datetime', 0) }} datetime
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-icon">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <strong>Missing Values:</strong> {{ missing_pct|round(1) }}% of all data points
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-icon">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                                <div>
+                                    <strong>Processed:</strong> {{ current_time.strftime('%Y-%m-%d %H:%M') if current_time else 'Today' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="quality-score">
+                            <canvas id="quality-gauge" width="150" height="150"></canvas>
+                            <div class="quality-score-value" id="quality-score-value"></div>
+                        </div>
+                        <p class="text-center mt-2">Data Quality Score</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Health Score -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-speedometer2 me-2"></i>
+                Dataset Health Analysis
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <canvas id="health-score-chart" height="250"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5>Health Metrics</h5>
+                                <ul class="list-group list-group-flush mt-3">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Completeness
+                                        <span class="badge bg-{{ 'success' if missing_pct < 5 else 'warning' if missing_pct < 20 else 'danger' }} rounded-pill">{{ (100 - missing_pct)|round|int }}%</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Column Types
+                                        <span class="badge bg-{{ 'success' if col_type_counts.get('categorical', 0) + col_type_counts.get('numeric', 0) > 0 else 'warning' }} rounded-pill">{{ 'Good' if col_type_counts.get('categorical', 0) + col_type_counts.get('numeric', 0) > 0 else 'Limited' }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Sample Size
+                                        <span class="badge bg-{{ 'success' if rows > 1000 else 'warning' if rows > 100 else 'danger' }} rounded-pill">{{ 'Large' if rows > 1000 else 'Medium' if rows > 100 else 'Small' }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Relationships
+                                        {% set has_correlations = correlations and correlations|length > 0 %}
+                                        <span class="badge bg-{{ 'success' if has_correlations else 'warning' }} rounded-pill">{{ 'Found' if has_correlations else 'Limited' }}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Column Types Row -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-table me-2"></i>
+                Column Types Distribution
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <canvas id="column-types-chart" height="250"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <div class="progress-container">
+                                    <h5>Numeric</h5>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (col_type_counts.get('numeric', 0) / columns * 100)|round }}%">
+                                            {{ col_type_counts.get('numeric', 0) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <div class="progress-container">
+                                    <h5>Categorical</h5>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ (col_type_counts.get('categorical', 0) / columns * 100)|round }}%">
+                                            {{ col_type_counts.get('categorical', 0) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <div class="progress-container">
+                                    <h5>Datetime</h5>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (col_type_counts.get('datetime', 0) / columns * 100)|round }}%">
+                                            {{ col_type_counts.get('datetime', 0) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Missing Values -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Missing Values Analysis
+            </div>
+            <div class="card-body">
+                {% if top_missing %}
+                    <div class="row">
+                        <div class="col-md-7">
+                            <h5>Top columns with missing values:</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Column</th>
+                                            <th>Missing %</th>
+                                            <th>Visualization</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for col, pct in top_missing %}
+                                        <tr>
+                                            <td>{{ col }}</td>
+                                            <td>{{ pct|round(1) }}%</td>
+                                            <td>
+                                                <div class="progress" style="height: 10px;">
+                                                    <div class="progress-bar bg-{{ 'danger' if pct > 20 else 'warning' }}" role="progressbar" style="width: {{ pct }}%"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <canvas id="missing-values-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>
+                        No missing values found in the dataset! Your data is complete.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Data Preprocessing Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-gear-fill me-2"></i>
+                Data Preprocessing Applied
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="preprocessing-card">
+                            <div class="text-center">
+                                <i class="bi bi-patch-check preprocessing-icon"></i>
+                                <h5>Missing Values</h5>
+                                <p>Missing values have been handled using median for numeric and mode for categorical data.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="preprocessing-card">
+                            <div class="text-center">
+                                <i class="bi bi-calendar-check preprocessing-icon"></i>
+                                <h5>Date Conversion</h5>
+                                <p>Date columns have been automatically detected and converted to proper datetime format.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="preprocessing-card">
+                            <div class="text-center">
+                                <i class="bi bi-shield-check preprocessing-icon"></i>
+                                <h5>Outlier Handling</h5>
+                                <p>Outliers in numeric columns have been identified and capped using the IQR method.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AI-Generated Chart Ideas -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-lightbulb me-2"></i>
+                AI-Generated Chart Ideas
+            </div>
+            <div class="card-body">
+                <p>Our AI has analyzed your data and suggests these visualizations to help you gain insights:</p>
+                
+                <div class="row">
+                    {% if llm_chart_ideas %}
+                        {% for idea in llm_chart_ideas[:4] %}
+                        <div class="col-md-6 mb-3">
+                            <div class="chart-idea-card" data-idea-index="{{ loop.index0 }}">
+                                <div class="chart-idea-title">{{ idea.title }}</div>
+                                <div class="chart-idea-type">{{ idea.type }}</div>
+                                <div class="chart-idea-description">{{ idea.description }}</div>
+                                <div class="chart-idea-columns">
+                                    <strong>Columns:</strong> {{ idea.columns|join(', ') }}
+                                </div>
+                                <button class="btn btn-sm btn-primary mt-2 generate-chart-btn">
+                                    <i class="bi bi-graph-up me-1"></i>Generate Chart
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                No AI-generated chart ideas available. This might be due to limited data or API configuration.
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Chart Preview Modal -->
+                <div class="modal fade" id="chartPreviewModal" tabindex="-1" aria-labelledby="chartPreviewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="chartPreviewModalLabel">Chart Preview</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="chart-preview-container" style="height: 500px;"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <a href="/visualizations" class="btn btn-primary">View All Visualizations</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Key Insights -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-lightbulb me-2"></i>
+                Key Insights
+            </div>
+            <div class="card-body">
+                {% for insight in insights %}
+                <div class="insight-card">
+                    <i class="bi bi-arrow-right-circle insight-icon"></i>
+                    {{ insight }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Data Sample -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-table me-2"></i>
+                Data Sample
+            </div>
+            <div class="card-body">
+                <div class="table-container">
+                    {{ sample_data|safe }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Next Steps -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-arrow-right-circle me-2"></i>
+                Next Steps
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-search mb-3" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                <h5>Explore Your Data</h5>
+                                <p>Filter, sort, and analyze your data in detail</p>
+                                <a href="/explorer" class="btn btn-primary">Go to Data Explorer</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-graph-up mb-3" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                <h5>View Visualizations</h5>
+                                <p>See recommended visualizations for your data</p>
+                                <a href="/visualizations" class="btn btn-primary">View Visualizations</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightbulb mb-3" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                <h5>Get Insights</h5>
+                                <p>Discover meaningful patterns and relationships</p>
+                                <a href="/insights" class="btn btn-primary">View Insights</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add this section to your overview.html template -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-grid-3x3 me-2"></i>
+                Correlation Heatmap
+            </div>
+            <div class="card-body">
+                <div id="correlation-heatmap" style="height: 500px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Calculate health score based on data characteristics
+    const missingPct = {{ missing_pct }};
+    const completenessScore = 100 - missingPct;
+    
+    const numRows = {{ rows }};
+    const sampleSizeScore = numRows > 1000 ? 100 : (numRows > 100 ? 70 : 40);
+    
+    const hasNumeric = {{ col_type_counts.get('numeric', 0) }} > 0;
+    const hasCategorical = {{ col_type_counts.get('categorical', 0) }} > 0;
+    const hasDateTime = {{ col_type_counts.get('datetime', 0) }} > 0;
+    const columnTypeScore = hasNumeric && hasCategorical ? 100 : 
+                            (hasNumeric || hasCategorical ? 70 : 40);
+    
+    const hasCorrelations = {{ 'true' if correlations and correlations|length > 0 else 'false' }};
+    const relationshipScore = hasCorrelations ? 90 : 50;
+    
+    const overallScore = Math.round((completenessScore + sampleSizeScore + columnTypeScore + relationshipScore) / 4);
+    
+    // Create radar chart for health scores
+    const ctx = document.getElementById('health-score-chart').getContext('2d');
+    const healthChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Completeness', 'Sample Size', 'Column Types', 'Relationships', 'Variability'],
+            datasets: [{
+                label: 'Dataset Health',
+                data: [
+                    completenessScore,
+                    sampleSizeScore,
+                    columnTypeScore,
+                    relationshipScore,
+                    hasNumeric ? 90 : 50
+                ],
+                fill: true,
+                backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                borderColor: 'rgba(76, 175, 80, 1)',
+                pointBackgroundColor: 'rgba(76, 175, 80, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(76, 175, 80, 1)'
+            }]
+        },
+        options: {
+            elements: {
+                line: {
+                    borderWidth: 3
+                }
+            },
+            scales: {
+                r: {
+                    angleLines: {
+                        display: true
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 100
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    
+    // Create column types pie chart
+    const columnTypesCtx = document.getElementById('column-types-chart').getContext('2d');
+    const columnTypesChart = new Chart(columnTypesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Numeric', 'Categorical', 'Datetime', 'Other'],
+            datasets: [{
+                data: [
+                    {{ col_type_counts.get('numeric', 0) }},
+                    {{ col_type_counts.get('categorical', 0) }},
+                    {{ col_type_counts.get('datetime', 0) }},
+                    {{ columns - col_type_counts.get('numeric', 0) - col_type_counts.get('categorical', 0) - col_type_counts.get('datetime', 0) }}
+                ],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(201, 203, 207, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(201, 203, 207, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
+        }
+    });
+    
+    // Create missing values chart if there are missing values
+    {% if top_missing %}
+    const missingValuesCtx = document.getElementById('missing-values-chart').getContext('2d');
+    const missingValuesChart = new Chart(missingValuesCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for col, pct in top_missing %}'{{ col }}',{% endfor %}],
+            datasets: [{
+                label: 'Missing Values (%)',
+                data: [{% for col, pct in top_missing %}{{ pct|round(1) }},{% endfor %}],
+                backgroundColor: [
+                    {% for col, pct in top_missing %}
+                    '{{ 'rgba(220, 53, 69, 0.8)' if pct > 20 else 'rgba(255, 193, 7, 0.8)' }}',
+                    {% endfor %}
+                ],
+                borderColor: [
+                    {% for col, pct in top_missing %}
+                    '{{ 'rgba(220, 53, 69, 1)' if pct > 20 else 'rgba(255, 193, 7, 1)' }}',
+                    {% endfor %}
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Missing Values by Column (%)'
+                }
+            }
+        }
+    });
+    {% endif %}
+    
+    // Create quality score gauge
+    const qualityGaugeCtx = document.getElementById('quality-gauge').getContext('2d');
+    const qualityGauge = new Chart(qualityGaugeCtx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [overallScore, 100 - overallScore],
+                backgroundColor: [
+                    getScoreColor(overallScore),
+                    'rgba(220, 220, 220, 0.2)'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            cutout: '80%',
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: false
+                }
+            }
+        }
+    });
+    
+    // Update quality score value
+    document.getElementById('quality-score-value').textContent = overallScore + '%';
+    document.getElementById('quality-score-value').style.color = getScoreColor(overallScore);
+    
+    // Function to get color based on score
+    function getScoreColor(score) {
+        if (score >= 80) {
+            return 'rgba(40, 167, 69, 0.8)'; // Green
+        } else if (score >= 60) {
+            return 'rgba(255, 193, 7, 0.8)'; // Yellow
+        } else {
+            return 'rgba(220, 53, 69, 0.8)'; // Red
+        }
+    }
+    
+    // Chart idea cards
+    const chartIdeaCards = document.querySelectorAll('.generate-chart-btn');
+    const chartPreviewModal = new bootstrap.Modal(document.getElementById('chartPreviewModal'));
+    const chartPreviewContainer = document.getElementById('chart-preview-container');
+    const chartPreviewModalLabel = document.getElementById('chartPreviewModalLabel');
+    
+    chartIdeaCards.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = this.closest('.chart-idea-card');
+            const ideaIndex = card.dataset.ideaIndex;
+            const title = card.querySelector('.chart-idea-title').textContent;
+            
+            // Update modal title
+            chartPreviewModalLabel.textContent = title;
+            
+            // Show loading in chart container
+            chartPreviewContainer.innerHTML = `
+                <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
+            
+            // Show modal
+            chartPreviewModal.show();
+            
+            // Generate chart
+            fetch('/api/create_llm_viz', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ idea_index: ideaIndex }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Render the chart
+                    Plotly.newPlot(chartPreviewContainer, data.data.data, data.data.layout);
+                } else {
+                    // Show error
+                    chartPreviewContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            ${data.error}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                // Show error
+                chartPreviewContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Error generating chart: ${error}
+                    </div>
+                `;
+            });
+        });
+    });
+
+        // Create correlation heatmap
+        fetch('/api/get_correlation_heatmap')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Plotly.newPlot('correlation-heatmap', data.data.data, data.data.layout);
+                } else {
+                    document.getElementById('correlation-heatmap').innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            ${data.error || 'Could not generate correlation heatmap'}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('correlation-heatmap').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Error generating correlation heatmap: ${error}
+                    </div>
+                `;
+            });
+});
+    </script>
+</body>
+</html>

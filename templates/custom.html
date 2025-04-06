@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Viz - Custom Charts</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --accent-color: #81C784;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+        
+        .navbar {
+            background-color: var(--dark-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--dark-bg);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .chart-type-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chart-type-card.selected {
+            border: 2px solid var(--primary-color);
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .chart-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .chart-builder {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .chart-preview {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            min-height: 500px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+
+    .chart-type-card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+        height: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .chart-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .chart-type-card.selected {
+        border: 2px solid var(--primary-color);
+        background-color: rgba(76, 175, 80, 0.05);
+    }
+    
+    .chart-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+    
+    .chart-recommendation {
+        margin-top: 10px;
+    }
+    
+    .column-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .column-card:hover {
+        background-color: rgba(76, 175, 80, 0.1);
+    }
+    
+    .column-card.selected {
+        background-color: rgba(76, 175, 80, 0.2);
+        border-left: 3px solid var(--primary-color);
+    }
+    
+    .column-type {
+        display: inline-block;
+        font-size: 0.8rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+    }
+    
+    .column-type.numeric {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+    
+    .column-type.categorical {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .column-type.datetime {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .chart-idea-card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+    
+    .chart-idea-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .chart-idea-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--dark-bg);
+    }
+    
+    .chart-idea-type {
+        display: inline-block;
+        background-color: var(--accent-color);
+        color: white;
+        padding: 3px 8px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        margin-bottom: 10px;
+    }
+    
+    .chart-idea-description {
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+    
+    .chart-idea-columns {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .drag-column-container {
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        min-height: 100px;
+        margin-bottom: 15px;
+    }
+    
+    .drag-column-container.active {
+        border-color: var(--primary-color);
+        background-color: rgba(76, 175, 80, 0.05);
+    }
+    
+    .draggable-column {
+        background-color: #e9ecef;
+        border-radius: 4px;
+        padding: 8px 12px;
+        margin: 5px;
+        display: inline-block;
+        cursor: grab;
+    }
+    
+    .draggable-column .remove-btn {
+        margin-left: 5px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bar-chart-fill me-2"></i>
+                Data Viz
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/explorer">Data Explorer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/visualizations">Visualizations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/insights">Insights</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/custom">Custom Charts</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+<!-- Update the custom chart selection interface -->
+<div class="container mt-4">
+    <h1 class="mb-4">Custom Chart Builder</h1>
+    <p class="lead mb-4">Create your own visualizations tailored to your specific needs.</p>
+    
+    <!-- Chart Type Selection Cards -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-palette me-2"></i>
+            Select Chart Type
+        </div>
+        <div class="card-body">
+            <div class="row chart-selector-row">
+                <div class="col-md-3 mb-3">
+                    <div class="chart-type-card" data-chart-type="bar">
+                        <i class="bi bi-bar-chart chart-icon"></i>
+                        <h5>Bar Chart</h5>
+                        <p class="text-muted">Compare values across categories</p>
+                        <div class="chart-recommendation">
+                            <span class="badge bg-primary">Categorical vs Numeric</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="chart-type-card" data-chart-type="line">
+                        <i class="bi bi-graph-up chart-icon"></i>
+                        <h5>Line Chart</h5>
+                        <p class="text-muted">Show trends over time or sequence</p>
+                        <div class="chart-recommendation">
+                            <span class="badge bg-primary">Time Series</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="chart-type-card" data-chart-type="scatter">
+                        <i class="bi bi-scatter-chart chart-icon"></i>
+                        <h5>Scatter Plot</h5>
+                        <p class="text-muted">Explore relationships between variables</p>
+                        <div class="chart-recommendation">
+                            <span class="badge bg-primary">Numeric vs Numeric</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="chart-type-card" data-chart-type="pie">
+                        <i class="bi bi-pie-chart chart-icon"></i>
+                        <h5>Pie Chart</h5>
+                        <p class="text-muted">Show composition of a whole</p>
+                        <div class="chart-recommendation">
+                            <span class="badge bg-primary">Categories</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="chart-type-card" data-chart-type="box">
+                        <i class="bi bi-box chart-icon"></i>
+                        <h5>Box Plot</h5>
+                        <p class="text-muted">Compare distributions across groups</p>
+                        <div class="chart-recommendation">
+                            <span class="badge bg-primary">Categorical vs Numeric</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="chart-type-card" data-chart-type="histogram">
+                        <i class="bi bi-bar-chart-steps chart-icon"></i>
+                        <h5>Histogram</h5>
+                        <p class="text-muted">Visualize distribution of a variable</p>
+                        <div class="chart-recommendation">
+                            <span class="badge bg-primary">Numeric</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="chart-type-card" data-chart-type="heatmap">
+                        <i class="bi bi-grid-3x3 chart-icon"></i>
+                        <h5>Heatmap</h5>
+                        <p class="text-muted">Show correlation between variables</p>
+                        <div class="chart-recommendation">
+                            <span class="badge bg-primary">Multiple Numeric</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="chart-type-card" data-chart-type="bubble">
+                        <i class="bi bi-circle chart-icon"></i>
+                        <h5>Bubble Chart</h5>
+                        <p class="text-muted">Compare three dimensions of data</p>
+                        <div class="chart-recommendation">
+                            <span class="badge bg-primary">Three Numerics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart Builder -->
+    <div id="chart-builder" class="chart-builder d-none">
+        <div class="card">
+            <div class="card-header">
+                <span id="chart-builder-title">Configure Chart</span>
+            </div>
+            <div class="card-body">
+                <!-- Dynamic Column Recommendation Tabs -->
+                <ul class="nav nav-tabs mb-3" id="recommendation-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="recommended-tab" data-bs-toggle="tab" data-bs-target="#recommended" type="button" role="tab">
+                            <i class="bi bi-star me-1"></i>Recommended
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="all-columns-tab" data-bs-toggle="tab" data-bs-target="#all-columns" type="button" role="tab">
+                            <i class="bi bi-list me-1"></i>All Columns
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="recommendation-tabs-content">
+                    <!-- Recommended Columns Tab -->
+                    <div class="tab-pane fade show active" id="recommended" role="tabpanel">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Based on your selected chart type, these columns are recommended for the best visualization.
+                        </div>
+                        
+                        <div id="recommended-columns-container">
+                            <!-- Will be dynamically populated -->
+                        </div>
+                    </div>
+                    
+                    <!-- All Columns Tab -->
+                    <div class="tab-pane fade" id="all-columns" role="tabpanel">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="column-search-input" placeholder="Search columns...">
+                        </div>
+                        
+                        <div class="row" id="all-columns-container">
+                            <!-- Will be dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dynamic Chart Configuration Form -->
+                <div id="chart-config-form-container" class="mt-4">
+                    <!-- Will be dynamically populated -->
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-secondary" id="reset-chart-btn">
+                        <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+                    </button>
+                    <button type="button" class="btn btn-primary" id="generate-chart-btn">
+                        <i class="bi bi-graph-up me-2"></i>Generate Chart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart Preview -->
+    <div id="chart-preview" class="chart-preview d-none">
+        <div class="card">
+            <div class="card-header">
+                <span id="chart-preview-title">Chart Preview</span>
+                <button type="button" class="btn-close float-end" id="close-preview-btn" aria-label="Close"></button>
+            </div>
+            <div class="card-body">
+                <div id="chart-container" style="height: 500px;"></div>
+                <div class="mt-3">
+                    <button id="download-chart" class="btn btn-success">
+                        <i class="bi bi-download me-2"></i>Download Chart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- LLM Chart Suggestions -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <i class="bi bi-lightbulb me-2"></i>
+            AI-Suggested Visualizations
+        </div>
+        <div class="card-body">
+            <p>Based on your data, our AI suggests these visualizations to help you gain deeper insights:</p>
+            
+            <div class="row">
+                {% if llm_chart_ideas %}
+                    {% for idea in llm_chart_ideas %}
+                    <div class="col-md-6 mb-3">
+                        <div class="chart-idea-card" data-idea-index="{{ loop.index0 }}">
+                            <div class="chart-idea-title">{{ idea.title }}</div>
+                            <div class="chart-idea-type">{{ idea.type }}</div>
+                            <div class="chart-idea-description">{{ idea.description }}</div>
+                            <div class="chart-idea-columns">
+                                <strong>Columns:</strong> {{ idea.columns|join(', ') }}
+                            </div>
+                            <button class="btn btn-sm btn-primary mt-2 generate-chart-btn">
+                                <i class="bi bi-graph-up me-1"></i>Generate Chart
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            No AI-generated chart ideas available. This might be due to limited data or API configuration.
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables
+    let selectedChartType = null;
+    let chartData = null;
+    const columnTypes = {{ columns_by_type|tojson }};
+    
+    // Elements
+    const chartTypeCards = document.querySelectorAll('.chart-type-card');
+    const chartBuilder = document.getElementById('chart-builder');
+    const chartBuilderTitle = document.getElementById('chart-builder-title');
+    const chartPreview = document.getElementById('chart-preview');
+    const chartPreviewTitle = document.getElementById('chart-preview-title');
+    const chartContainer = document.getElementById('chart-container');
+    const closePreviewBtn = document.getElementById('close-preview-btn');
+    const generateChartBtn = document.getElementById('generate-chart-btn');
+    const resetChartBtn = document.getElementById('reset-chart-btn');
+    const recommendedColumnsContainer = document.getElementById('recommended-columns-container');
+    const allColumnsContainer = document.getElementById('all-columns-container');
+    const chartConfigFormContainer = document.getElementById('chart-config-form-container');
+    const columnSearchInput = document.getElementById('column-search-input');
+    
+    // Chart type selection event
+    chartTypeCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove selected class from all cards
+            chartTypeCards.forEach(c => c.classList.remove('selected'));
+            
+            // Add selected class to clicked card
+            this.classList.add('selected');
+            
+            // Get chart type
+            selectedChartType = this.dataset.chartType;
+            
+            // Update builder title
+            chartBuilderTitle.textContent = `Configure ${selectedChartType.charAt(0).toUpperCase() + selectedChartType.slice(1)} Chart`;
+            
+            // Show chart builder
+            chartBuilder.classList.remove('d-none');
+            
+            // Hide chart preview
+            chartPreview.classList.add('d-none');
+            
+            // Populate recommended columns
+            populateRecommendedColumns(selectedChartType);
+            
+            // Populate all columns
+            populateAllColumns();
+            
+            // Create chart configuration form
+            createChartConfigForm(selectedChartType);
+            
+            // Scroll to chart builder
+            chartBuilder.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+    
+    // Close preview button
+    closePreviewBtn.addEventListener('click', function() {
+        chartPreview.classList.add('d-none');
+    });
+    
+    // Generate chart button
+    generateChartBtn.addEventListener('click', function() {
+        generateCustomChart();
+    });
+    
+    // Reset chart button
+    resetChartBtn.addEventListener('click', function() {
+        resetChartBuilder();
+    });
+    
+    // Column search
+    columnSearchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const columnCards = allColumnsContainer.querySelectorAll('.column-card');
+        
+        columnCards.forEach(card => {
+            const columnName = card.querySelector('h6').textContent.toLowerCase();
+            if (columnName.includes(searchTerm)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+    
+    // AI-generated chart buttons
+    const aiChartBtns = document.querySelectorAll('.generate-chart-btn');
+    
+    aiChartBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = this.closest('.chart-idea-card');
+            const ideaIndex = card.dataset.ideaIndex;
+            const title = card.querySelector('.chart-idea-title').textContent;
+            
+            // Update chart preview title
+            chartPreviewTitle.textContent = title;
+            
+            // Show loading in chart container
+            chartContainer.innerHTML = `
+                <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `;
+            
+            // Show preview
+            chartPreview.classList.remove('d-none');
+            
+            // Scroll to preview
+            chartPreview.scrollIntoView({ behavior: 'smooth' });
+            
+            // Generate chart
+            fetch('/api/create_llm_viz', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ idea_index: ideaIndex }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    // Show error
+                    chartContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            ${data.error}
+                        </div>
+                    `;
+                    return;
+                }
+                
+                if (data.success) {
+                    // Render the chart
+                    Plotly.newPlot('chart-container', data.data.data, data.data.layout);
+                    // Store chart data for download
+                    chartData = data.data;
+                } else {
+                    // Show error
+                    chartContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Failed to create visualization
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                // Show error
+                chartContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Error generating chart: ${error}
+                    </div>
+                `;
+            });
+        });
+    });
+    
+    // Download chart button
+    document.getElementById('download-chart').addEventListener('click', function() {
+        if (chartContainer && chartContainer._fullLayout) {
+            Plotly.downloadImage(chartContainer, {
+                format: 'png',
+                filename: `custom-chart`,
+                width: 1200,
+                height: 800
+            });
+        } else {
+            alert('Chart not ready for download. Please try again in a moment.');
+        }
+    });
+    
+    // Functions
+    function populateRecommendedColumns(chartType) {
+        recommendedColumnsContainer.innerHTML = '';
+        
+        let recommendedColumnTypes = [];
+        let axisLabels = {};
+        
+        // Determine recommended column types based on chart type
+        switch(chartType) {
+            case 'bar':
+                recommendedColumnTypes = ['categorical', 'numeric'];
+                axisLabels = { 'categorical': 'X-Axis (Category)', 'numeric': 'Y-Axis (Value)' };
+                break;
+            case 'line':
+                recommendedColumnTypes = ['datetime', 'numeric'];
+                axisLabels = { 'datetime': 'X-Axis (Time)', 'numeric': 'Y-Axis (Value)' };
+                break;
+            case 'scatter':
+                recommendedColumnTypes = ['numeric', 'numeric'];
+                axisLabels = { 'numeric': 'X/Y Axes (Values)' };
+                //   'numeric';
+                // axisLabels = { 'numeric': 'X/Y Axes (Values)' };
+                break;
+            case 'pie':
+                recommendedColumnTypes = ['categorical'];
+                axisLabels = { 'categorical': 'Categories' };
+                break;
+            case 'box':
+                recommendedColumnTypes = ['categorical', 'numeric'];
+                axisLabels = { 'categorical': 'X-Axis (Groups)', 'numeric': 'Y-Axis (Values)' };
+                break;
+            case 'histogram':
+                recommendedColumnTypes = ['numeric'];
+                axisLabels = { 'numeric': 'Values' };
+                break;
+            case 'heatmap':
+                recommendedColumnTypes = ['numeric', 'numeric'];
+                axisLabels = { 'numeric': 'Numeric Columns' };
+                break;
+            case 'bubble':
+                recommendedColumnTypes = ['numeric', 'numeric', 'numeric'];
+                axisLabels = { 'numeric': 'X/Y/Size Axes (Values)' };
+                break;
+            default:
+                recommendedColumnTypes = ['categorical', 'numeric'];
+                axisLabels = { 'categorical': 'Categories', 'numeric': 'Values' };
+        }
+        
+        // Create sections for each recommended column type
+        recommendedColumnTypes.forEach((type, index) => {
+            const typePlural = recommendedColumnTypes.filter(t => t === type).length > 1;
+            const typeLabel = typePlural ? `${type.charAt(0).toUpperCase() + type.slice(1)} Columns` : `${type.charAt(0).toUpperCase() + type.slice(1)} Column`;
+            const axisLabel = axisLabels[type] || typeLabel;
+            
+            const section = document.createElement('div');
+            section.className = 'mb-4';
+            section.innerHTML = `
+                <h5>${axisLabel}</h5>
+                <div class="drag-column-container" id="recommended-${type}-container" data-type="${type}">
+                    <p class="text-muted text-center mb-0" id="recommended-${type}-placeholder">Drag columns here or select from recommended columns below</p>
+                </div>
+                <div class="row" id="recommended-${type}-columns">
+                    <!-- Will be populated with column cards -->
+                </div>
+            `;
+            
+            recommendedColumnsContainer.appendChild(section);
+            
+            // Populate recommended columns of this type
+            const columnsContainer = section.querySelector(`#recommended-${type}-columns`);
+            
+            if (columnTypes[type]) {
+                // Limit to 8 columns
+                const columns = columnTypes[type].slice(0, 8);
+                
+                columns.forEach(col => {
+                    const colCard = document.createElement('div');
+                    colCard.className = 'col-md-3 mb-3';
+                    colCard.innerHTML = `
+                        <div class="column-card" data-column="${col}" data-type="${type}">
+                            <span class="column-type ${type}">${type}</span>
+                            <h6 class="mb-1">${col}</h6>
+                            <button class="btn btn-sm btn-primary w-100 mt-2 select-column-btn">Select</button>
+                        </div>
+                    `;
+                    
+                    columnsContainer.appendChild(colCard);
+                });
+                
+                // Add event listeners to select buttons
+                columnsContainer.querySelectorAll('.select-column-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const card = this.closest('.column-card');
+                        const column = card.dataset.column;
+                        const type = card.dataset.type;
+                        
+                        addColumnToContainer(column, type);
+                    });
+                });
+            } else {
+                columnsContainer.innerHTML = `<div class="col-12"><div class="alert alert-warning">No ${type} columns found in dataset</div></div>`;
+            }
+        });
+        
+        // Setup drag and drop functionality
+        setupDragAndDrop();
+    }
+    
+    function populateAllColumns() {
+        allColumnsContainer.innerHTML = '';
+        
+        // Flatten all columns
+        const allColumns = [];
+        for (const type in columnTypes) {
+            columnTypes[type].forEach(col => {
+                allColumns.push({ name: col, type: type });
+            });
+        }
+        
+        // Sort alphabetically
+        allColumns.sort((a, b) => a.name.localeCompare(b.name));
+        
+        // Create column cards
+        allColumns.forEach(col => {
+            const colCard = document.createElement('div');
+            colCard.className = 'col-md-3 mb-3';
+            colCard.innerHTML = `
+                <div class="column-card" data-column="${col.name}" data-type="${col.type}">
+                    <span class="column-type ${col.type}">${col.type}</span>
+                    <h6 class="mb-1">${col.name}</h6>
+                    <button class="btn btn-sm btn-primary w-100 mt-2 select-column-btn">Select</button>
+                </div>
+            `;
+            
+            allColumnsContainer.appendChild(colCard);
+        });
+        
+        // Add event listeners to select buttons
+        allColumnsContainer.querySelectorAll('.select-column-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.column-card');
+                const column = card.dataset.column;
+                const type = card.dataset.type;
+                
+                addColumnToContainer(column, type);
+            });
+        });
+    }
+    
+    function addColumnToContainer(column, type) {
+        // Find the appropriate container
+        const container = document.querySelector(`#recommended-${type}-container`);
+        if (!container) return;
+        
+        // Hide placeholder text
+        const placeholder = document.querySelector(`#recommended-${type}-placeholder`);
+        if (placeholder) placeholder.style.display = 'none';
+        
+        // Create draggable column element
+        const colElement = document.createElement('div');
+        colElement.className = 'draggable-column';
+        colElement.setAttribute('draggable', 'true');
+        colElement.dataset.column = column;
+        colElement.dataset.type = type;
+        colElement.innerHTML = `
+            ${column}
+            <span class="remove-btn" title="Remove"><i class="bi bi-x"></i></span>
+        `;
+        
+        // Add to container
+        container.appendChild(colElement);
+        
+        // Add event listener to remove button
+        colElement.querySelector('.remove-btn').addEventListener('click', function() {
+            colElement.remove();
+            
+            // Show placeholder if container is empty
+            if (container.querySelectorAll('.draggable-column').length === 0) {
+                if (placeholder) placeholder.style.display = '';
+            }
+        });
+        
+        // Add drag events to the new element
+        colElement.addEventListener('dragstart', handleDragStart);
+        colElement.addEventListener('dragend', handleDragEnd);
+    }
+    
+    function setupDragAndDrop() {
+        // Get all drag containers
+        const containers = document.querySelectorAll('.drag-column-container');
+        
+        // Add event listeners for containers
+        containers.forEach(container => {
+            container.addEventListener('dragover', handleDragOver);
+            container.addEventListener('dragenter', handleDragEnter);
+            container.addEventListener('dragleave', handleDragLeave);
+            container.addEventListener('drop', handleDrop);
+        });
+    }
+    
+    function handleDragStart(e) {
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+            column: this.dataset.column,
+            type: this.dataset.type
+        }));
+        this.classList.add('dragging');
+    }
+    
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+    }
+    
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+    
+    function handleDragEnter(e) {
+        e.preventDefault();
+        this.classList.add('active');
+    }
+    
+    function handleDragLeave(e) {
+        this.classList.remove('active');
+    }
+    
+    function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove('active');
+        
+        // Get dropped data
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        const column = data.column;
+        const type = data.type;
+        
+        // Check if container accepts this type
+        if (this.dataset.type === type) {
+            // Add column to this container
+            addColumnToContainer(column, type);
+            
+            // If dragged from another container, remove from there
+            const draggedElement = document.querySelector(`.draggable-column.dragging`);
+            if (draggedElement) {
+                draggedElement.remove();
+            }
+        }
+    }
+    
+    function createChartConfigForm(chartType) {
+        chartConfigFormContainer.innerHTML = '';
+        
+        // Create basic configuration form based on chart type
+        let formHtml = `<h5>Additional Configuration</h5>`;
+        
+        switch(chartType) {
+            case 'bar':
+                formHtml += `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Chart Title</label>
+                                <input type="text" class="form-control" id="chart-title" value="Bar Chart">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Orientation</label>
+                                <select class="form-select" id="bar-orientation">
+                                    <option value="vertical">Vertical</option>
+                                    <option value="horizontal">Horizontal</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Sort Bars</label>
+                                <select class="form-select" id="bar-sort">
+                                    <option value="none">None</option>
+                                    <option value="ascending">Ascending</option>
+                                    <option value="descending">Descending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Label Values</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="bar-labels">
+                                    <label class="form-check-label" for="bar-labels">Show value labels</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'line':
+                formHtml += `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Chart Title</label>
+                                <input type="text" class="form-control" id="chart-title" value="Line Chart">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Line Type</label>
+                                <select class="form-select" id="line-type">
+                                    <option value="solid">Solid</option>
+                                    <option value="dashed">Dashed</option>
+                                    <option value="dotted">Dotted</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Show Markers</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="line-markers" checked>
+                                    <label class="form-check-label" for="line-markers">Show data points</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Smoothing</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="line-smooth">
+                                    <label class="form-check-label" for="line-smooth">Apply smoothing</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            // Add other chart types as needed
+            default:
+                formHtml += `
+                    <div class="mb-3">
+                        <label class="form-label">Chart Title</label>
+                        <input type="text" class="form-control" id="chart-title" value="${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Chart">
+                    </div>
+                `;
+        }
+        
+        chartConfigFormContainer.innerHTML = formHtml;
+    }
+    
+    function generateCustomChart() {
+        // Get selected columns
+        const selectedColumns = {};
+        const containers = document.querySelectorAll('.drag-column-container');
+        
+        containers.forEach(container => {
+            const type = container.dataset.type;
+            const columns = Array.from(container.querySelectorAll('.draggable-column')).map(col => col.dataset.column);
+            
+            if (!selectedColumns[type]) {
+                selectedColumns[type] = [];
+            }
+            
+            selectedColumns[type] = selectedColumns[type].concat(columns);
+        });
+        
+        // Check if we have necessary columns
+        let missingColumns = false;
+        
+        switch(selectedChartType) {
+            case 'bar':
+                if (!selectedColumns.categorical || selectedColumns.categorical.length === 0 ||
+                    !selectedColumns.numeric || selectedColumns.numeric.length === 0) {
+                    missingColumns = true;
+                }
+                break;
+            case 'line':
+                if ((!selectedColumns.datetime || selectedColumns.datetime.length === 0) &&
+                    (!selectedColumns.categorical || selectedColumns.categorical.length === 0) ||
+                    !selectedColumns.numeric || selectedColumns.numeric.length === 0) {
+                    missingColumns = true;
+                }
+                break;
+            case 'scatter':
+                if (!selectedColumns.numeric || selectedColumns.numeric.length < 2) {
+                    missingColumns = true;
+                }
+                break;
+            case 'pie':
+                if (!selectedColumns.categorical || selectedColumns.categorical.length === 0) {
+                    missingColumns = true;
+                }
+                break;
+            case 'box':
+                if (!selectedColumns.categorical || selectedColumns.categorical.length === 0 ||
+                    !selectedColumns.numeric || selectedColumns.numeric.length === 0) {
+                    missingColumns = true;
+                }
+                break;
+            case 'histogram':
+                if (!selectedColumns.numeric || selectedColumns.numeric.length === 0) {
+                    missingColumns = true;
+                }
+                break;
+            case 'heatmap':
+                if (!selectedColumns.numeric || selectedColumns.numeric.length < 2) {
+                    missingColumns = true;
+                }
+                break;
+            case 'bubble':
+                if (!selectedColumns.numeric || selectedColumns.numeric.length < 3) {
+                    missingColumns = true;
+                }
+                break;
+        }
+        
+        if (missingColumns) {
+            alert('Please select the required columns for this chart type.');
+            return;
+        }
+        
+        // Get additional chart configuration
+        const chartTitle = document.getElementById('chart-title')?.value || `${selectedChartType.charAt(0).toUpperCase() + selectedChartType.slice(1)} Chart`;
+        
+        // Update chart preview title
+        chartPreviewTitle.textContent = chartTitle;
+        
+        // Show loading in chart container
+        chartContainer.innerHTML = `
+            <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        `;
+        
+        // Show preview
+        chartPreview.classList.remove('d-none');
+        
+        // Scroll to preview
+        chartPreview.scrollIntoView({ behavior: 'smooth' });
+        
+        // Create chart configuration for API call
+        const apiConfig = {
+            chart_type: selectedChartType,
+            config: {
+                title: chartTitle,
+                ...selectedColumns
+            }
+        };
+        
+        // Add type-specific configuration
+        switch(selectedChartType) {
+            case 'bar':
+                apiConfig.config.orientation = document.getElementById('bar-orientation')?.value || 'vertical';
+                apiConfig.config.sort = document.getElementById('bar-sort')?.value || 'none';
+                apiConfig.config.show_labels = document.getElementById('bar-labels')?.checked || false;
+                break;
+            case 'line':
+                apiConfig.config.line_type = document.getElementById('line-type')?.value || 'solid';
+                apiConfig.config.show_markers = document.getElementById('line-markers')?.checked || true;
+                apiConfig.config.smooth = document.getElementById('line-smooth')?.checked || false;
+                break;
+            // Add other chart types as needed
+        }
+        
+        // Generate chart using API
+        fetch('/api/create_custom_viz', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(apiConfig),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                // Show error
+                chartContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        ${data.error}
+                    </div>
+                `;
+                return;
+            }
+            
+            if (data.success) {
+                // Render the chart
+                Plotly.newPlot('chart-container', data.data.data, data.data.layout);
+                // Store chart data for download
+                chartData = data.data;
+            } else {
+                // Show error
+                chartContainer.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Failed to create visualization
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            // Show error
+            chartContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Error generating chart: ${error}
+                </div>
+            `;
+        });
+    }
+    
+    function resetChartBuilder() {
+        // Clear selected columns
+        const containers = document.querySelectorAll('.drag-column-container');
+        containers.forEach(container => {
+            container.innerHTML = `<p class="text-muted text-center mb-0" id="recommended-${container.dataset.type}-placeholder">Drag columns here or select from recommended columns below</p>`;
+        });
+        
+        // Reset form to default values
+        createChartConfigForm(selectedChartType);
+    }
+});
+</script>
+

@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Viz - Data Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --accent-color: #81C784;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+        
+        .navbar {
+            background-color: var(--dark-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--dark-bg);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .filter-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .column-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .column-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .column-type-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color) !important;
+            border-color: #dee2e6 #dee2e6 #fff;
+            font-weight: 600;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text-color) !important;
+        }
+        
+        .column-details {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        
+        /* AI Insights styles */
+        .ai-insights {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .ai-insight-item {
+            padding: 10px 15px;
+            border-left: 3px solid var(--primary-color);
+            background-color: rgba(76, 175, 80, 0.05);
+            margin-bottom: 10px;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+    // Add error handling for page load
+    window.addEventListener('error', function(e) {
+        console.error('Page load error:', e.message);
+        document.body.innerHTML = `
+            <div class="container mt-5">
+                <div class="alert alert-danger">
+                    <h4><i class="bi bi-exclamation-triangle me-2"></i>Error Loading Page</h4>
+                    <p>There was an error loading the Data Explorer page. Please try refreshing or contact support.</p>
+                    <p>Error details: ${e.message}</p>
+                    <a href="/" class="btn btn-primary">Return to Home</a>
+                </div>
+            </div>
+        `;
+    });
+</script>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bar-chart-fill me-2"></i>
+                Data Viz
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/explorer">Data Explorer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/visualizations">Visualizations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/insights">Insights</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom">Custom Charts</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="mb-4">Data Explorer</h1>
+        
+        <!-- Filter Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="bi bi-funnel me-2"></i>
+                Filter Data
+            </div>
+            <div class="card-body">
+                <div class="filter-card">
+                    <form id="filter-form">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="filter-columns" class="form-label">Select columns to filter</label>
+                                <select class="form-select" id="filter-columns" multiple>
+                                    {% for col in column_names %}
+                                    <option value="{{ col }}">{{ col }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Hold Ctrl/Cmd to select multiple columns</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="filter-options">
+                                    <!-- Filter options will be dynamically added here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-funnel-fill me-2"></i>Apply Filters
+                            </button>
+                            <button type="button" id="reset-filters" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-counterclockwise me-2"></i>Reset Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="filter-results" class="mt-4 d-none">
+                    <div class="alert alert-success">
+                        <span id="filtered-count"></span>
+                    </div>
+                    <div class="table-container">
+                        <table class="table table-striped table-hover" id="filtered-table">
+                            <thead>
+                                <tr>
+                                    <!-- Table headers will be dynamically added -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Table rows will be dynamically added -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3">
+                        <button type="button" id="download-filtered" class="btn btn-success">
+                            <i class="bi bi-download me-2"></i>Download Filtered Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Column Explorer -->
+        <div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-columns-gap me-2"></i>
+        Column Explorer
+        <div class="float-end">
+            <input type="text" id="column-search" class="form-control form-control-sm d-inline-block" placeholder="Search columns" style="width: 200px;">
+            <button class="btn btn-sm btn-outline-light ms-2" id="toggle-missing-btn">
+                <i class="bi bi-exclamation-triangle"></i> Show Missing
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Column Overview Panel -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-info-circle me-2"></i>Column Overview</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Columns
+                                <span class="badge bg-primary rounded-pill">{{ column_names|length }}</span>
+                            </li>
+                            {% for type, columns in columns_by_type.items() %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ type|capitalize }}
+                                <span class="badge bg-primary rounded-pill">{{ columns|length }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="card bg-light mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-exclamation-triangle me-2"></i>Missing Data</h5>
+                        <div class="mt-3">
+                            {% set missing_cols = [] %}
+                            {% for col in column_names %}
+                                {% if stats[col].missing_pct > 0 %}
+                                    {% set missing_cols = missing_cols + [col] %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if missing_cols %}
+                                <p>{{ missing_cols|length }} columns with missing values</p>
+                                <ul class="list-group list-group-flush missing-columns-list">
+                                    {% for col in missing_cols[:5] %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ col }}
+                                        <div class="progress" style="width: 100px; height: 10px;">
+                                            <div class="progress-bar bg-warning" style="width: {{ stats[col].missing_pct }}%"></div>
+                                        </div>
+                                        <span class="badge bg-warning text-dark">{{ stats[col].missing_pct|round(1) }}%</span>
+                                    </li>
+                                    {% endfor %}
+                                    {% if missing_cols|length > 5 %}
+                                    <li class="list-group-item text-center">
+                                        <button class="btn btn-sm btn-link" id="show-more-missing-btn">Show more</button>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            {% else %}
+                                <div class="alert alert-success">
+                                    No missing values detected!
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <!-- Column Type Tabs -->
+                <ul class="nav nav-tabs mb-4" id="columnTypeTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                            All Columns
+                        </button>
+                    </li>
+                    {% for type, columns in columns_by_type.items() %}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="{{ type }}-tab" data-bs-toggle="tab" data-bs-target="#{{ type }}" type="button" role="tab">
+                            {{ type|capitalize }} ({{ columns|length }})
+                        </button>
+                    </li>
+                    {% endfor %}
+                </ul>
+                
+                <!-- Column Type Tab Content -->
+                <div class="tab-content" id="columnTypeContent">
+                    <!-- All Columns Tab -->
+                    <div class="tab-pane fade show active" id="all" role="tabpanel">
+                        <div class="row">
+                            {% for col in column_names %}
+                            <div class="col-md-4 mb-4 column-card-wrapper" 
+                                 data-column="{{ col }}" 
+                                 data-type="{{ column_types[col] }}" 
+                                 data-missing="{{ stats[col].missing_pct }}">
+                                <div class="column-card">
+                                    <span class="column-type-badge">{{ column_types[col] }}</span>
+                                    <h5>{{ col }}</h5>
+                                    <p class="text-muted mb-0">
+                                        {% if stats[col].missing_pct > 0 %}
+                                        <span class="text-warning">
+                                            <i class="bi bi-exclamation-triangle me-1"></i>
+                                            {{ stats[col].missing_pct|round(1) }}% missing
+                                        </span>
+                                        {% else %}
+                                        <span class="text-success">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            No missing values
+                                        </span>
+                                        {% endif %}
+                                    </p>
+                                    <p class="text-muted mb-0">
+                                        <i class="bi bi-hash me-1"></i>
+                                        {{ stats[col].unique_count }} unique values
+                                    </p>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-primary view-column-btn">
+                                            <i class="bi bi-info-circle me-1"></i>View Details
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary correlations-btn" title="Find correlations">
+                                            <i class="bi bi-link-45deg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Specific Column Type Tabs -->
+                    {% for type, columns in columns_by_type.items() %}
+                    <div class="tab-pane fade" id="{{ type }}" role="tabpanel">
+                        <div class="row">
+                            {% for col in columns %}
+                            <div class="col-md-4 mb-4">
+                                <div class="column-card" data-column="{{ col }}">
+                                    <span class="column-type-badge">{{ type }}</span>
+                                    <h5>{{ col }}</h5>
+                                    <p class="text-muted mb-0">
+                                        {% if stats[col].missing_pct > 0 %}
+                                        <span class="text-warning">
+                                            <i class="bi bi-exclamation-triangle me-1"></i>
+                                            {{ stats[col].missing_pct|round(1) }}% missing
+                                        </span>
+                                        {% else %}
+                                        <span class="text-success">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            No missing values
+                                        </span>
+                                        {% endif %}
+                                    </p>
+                                    <p class="text-muted mb-0">
+                                        <i class="bi bi-hash me-1"></i>
+                                        {{ stats[col].unique_count }} unique values
+                                    </p>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-primary view-column-btn">
+                                            <i class="bi bi-info-circle me-1"></i>View Details
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary correlations-btn" title="Find correlations">
+                                            <i class="bi bi-link-45deg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Column Details Section -->
+        <div id="column-details" class="column-details d-none">
+            <!-- Column details will be dynamically added here -->
+        </div>
+        
+        <!-- AI Insights for Column -->
+        <div id="column-ai-insights" class="ai-insights d-none">
+            <h4><i class="bi bi-lightbulb me-2"></i>AI Insights</h4>
+            <div id="ai-insights-content">
+                <!-- AI insights will be dynamically added here -->
+            </div>
+        </div>
+        
+        <!-- Correlation Finder Modal -->
+        <div class="modal fade" id="correlationModal" tabindex="-1" aria-labelledby="correlationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="correlationModalLabel">Column Relationships</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="correlation-content">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p>Finding relationships...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Preview Panel -->
+        <div id="data-preview-panel" class="mt-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-table me-2"></i>
+                        Data Preview
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-light" id="data-transformation-btn">
+                            <i class="bi bi-gear me-1"></i>Transformations
+                        </button>
+                        <button class="btn btn-sm btn-outline-light ms-2" id="export-data-btn">
+                            <i class="bi bi-download me-1"></i>Export
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="data-preview-table">
+                            <thead>
+                                <tr>
+                                    <!-- Table headers dynamically populated -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Table rows dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div>
+                            <select class="form-select form-select-sm d-inline-block" id="rows-per-page" style="width: 80px;">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <span class="ms-2">rows per page</span>
+                        </div>
+                        <div id="pagination-controls">
+                            <!-- Pagination controls dynamically populated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Transformation Modal -->
+        <div class="modal fade" id="transformationModal" tabindex="-1" aria-labelledby="transformationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="transformationModalLabel">Data Transformation Tools</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs" id="transformationTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="filter-tab" data-bs-toggle="tab" data-bs-target="#filter-panel" type="button" role="tab">Filter</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="rename-tab" data-bs-toggle="tab" data-bs-target="#rename-panel" type="button" role="tab">Rename</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="sample-tab" data-bs-toggle="tab" data-bs-target="#sample-panel" type="button" role="tab">Sample</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#delete-panel" type="button" role="tab">Delete</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content mt-3" id="transformationTabContent">
+                            <!-- Filter Panel -->
+                            <div class="tab-pane fade show active" id="filter-panel" role="tabpanel">
+                                <p>Create complex filters to extract specific data.</p>
+                                <div id="filter-builder">
+                                    <!-- Filter options dynamically generated -->
+                                </div>
+                                <button class="btn btn-primary mt-3" id="apply-filter-btn">Apply Filter</button>
+                            </div>
+                            
+                            <!-- Rename Panel -->
+                            <div class="tab-pane fade" id="rename-panel" role="tabpanel">
+                                <p>Rename columns for better clarity.</p>
+                                <div id="rename-builder">
+                                    <!-- Rename options dynamically generated -->
+                                </div>
+                                <button class="btn btn-primary mt-3" id="apply-rename-btn">Rename Columns</button>
+                            </div>
+                            
+                            <!-- Sample Panel -->
+                            <div class="tab-pane fade" id="sample-panel" role="tabpanel">
+                                <p>Extract a sample of rows from your dataset.</p>
+                                <div class="mb-3">
+                                    <label class="form-label">Sample Size</label>
+                                    <input type="number" class="form-control" id="sample-size" min="1" value="100">
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sample-method" id="random-sample" value="random" checked>
+                                        <label class="form-check-label" for="random-sample">
+                                            Random Sample
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="sample-method" id="top-sample" value="top">
+                                        <label class="form-check-label" for="top-sample">
+                                            First N Rows
+                                        </label>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary" id="apply-sample-btn">Extract Sample</button>
+                            </div>
+                            
+                            <!-- Delete Panel -->
+                            <div class="tab-pane fade" id="delete-panel" role="tabpanel">
+                                <p>Delete columns you don't need.</p>
+                                <div id="delete-builder">
+                                    <!-- Delete options dynamically generated -->
+                                </div>
+                                <button class="btn btn-danger mt-3" id="apply-delete-btn">Delete Columns</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Enhanced Column card click event
+    document.querySelectorAll('.view-column-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const column = this.closest('.column-card').dataset.column;
+            showColumnDetails(column);
+        });
+    });
+    
+    // Column search functionality
+    const columnSearch = document.getElementById('column-search');
+    columnSearch.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        document.querySelectorAll('.column-card-wrapper').forEach(card => {
+            const columnName = card.dataset.column.toLowerCase();
+            if (columnName.includes(searchTerm)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+    
+    // Toggle missing data columns
+    const toggleMissingBtn = document.getElementById('toggle-missing-btn');
+    toggleMissingBtn.addEventListener('click', function() {
+        const isShowingOnlyMissing = this.classList.contains('active');
+        
+        if (isShowingOnlyMissing) {
+            // Show all columns
+            document.querySelectorAll('.column-card-wrapper').forEach(card => {
+                card.style.display = '';
+            });
+            this.classList.remove('active');
+            this.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Show Missing';
+        } else {
+            // Show only columns with missing values
+            document.querySelectorAll('.column-card-wrapper').forEach(card => {
+                const missingPct = parseFloat(card.dataset.missing);
+                if (missingPct > 0) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            this.classList.add('active');
+            this.innerHTML = '<i class="bi bi-card-list"></i> Show All';
+        }
+    });
+    
+    // Show more missing columns
+    const showMoreMissingBtn = document.getElementById('show-more-missing-btn');
+    if (showMoreMissingBtn) {
+        showMoreMissingBtn.addEventListener('click', function() {
+            // Implementation would show a modal with all missing columns
+            alert('This would show all columns with missing values');
+        });
+    }
+    
+    // Correlation finder
+    const correlationBtns = document.querySelectorAll('.correlations-btn');
+    const correlationModal = new bootstrap.Modal(document.getElementById('correlationModal'));
+    const correlationContent = document.getElementById('correlation-content');
+    
+    correlationBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const column = this.closest('.column-card').dataset.column;
+            document.getElementById('correlationModalLabel').textContent = `Relationships for ${column}`;
+            
+            // Show modal with loading state
+            correlationModal.show();
+            
+            // This would be replaced with actual API call to get correlations
+            setTimeout(() => {
+                correlationContent.innerHTML = `
+                    <h5>Top Correlations with ${column}</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Correlation</th>
+                                    <th>Strength</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Column A</td>
+                                    <td>0.85</td>
+                                    <td><span class="badge bg-success">Strong</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Column B</td>
+                                    <td>0.67</td>
+                                    <td><span class="badge bg-warning text-dark">Moderate</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Column C</td>
+                                    <td>0.42</td>
+                                    <td><span class="badge bg-danger">Weak</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="correlation-chart" style="height: 300px;"></div>
+                `;
+                
+                // Create a simple chart
+                const trace = {
+                    x: ['Column A', 'Column B', 'Column C'],
+                    y: [0.85, 0.67, 0.42],
+                    type: 'bar',
+                    marker: {
+                        color: ['#28a745', '#ffc107', '#dc3545']
+                    }
+                };
+                
+                const layout = {
+                    title: `Correlation Strength with ${column}`,
+                    xaxis: { title: 'Column' },
+                    yaxis: { title: 'Correlation Coefficient' }
+                };
+                
+                Plotly.newPlot('correlation-chart', [trace], layout);
+            }, 1000);
+        });
+    });
+    
+    // Data transformation button
+    const dataTransformationBtn = document.getElementById('data-transformation-btn');
+    const transformationModal = new bootstrap.Modal(document.getElementById('transformationModal'));
+    
+    dataTransformationBtn.addEventListener('click', function() {
+        transformationModal.show();
+    });
+    
+    // Initialize the data preview table
+    initializeDataPreview();
+    
+    function initializeDataPreview() {
+        const table = document.getElementById('data-preview-table');
+        const thead = table.querySelector('thead tr');
+        const tbody = table.querySelector('tbody');
+        const paginationControls = document.getElementById('pagination-controls');
+        
+        // Example data generation - this would be replaced with actual API call
+        const columns = {{ column_names|tojson }};
+        const rowsPerPage = 10;
+        const totalRows = 100; // Example total count
+        const currentPage = 1;
+        
+        // Create table headers
+        thead.innerHTML = '';
+        columns.forEach(col => {
+            const th = document.createElement('th');
+            th.textContent = col;
+            thead.appendChild(th);
+        });
+        
+        // Create sample rows
+        tbody.innerHTML = '';
+        for (let i = 0; i < rowsPerPage; i++) {
+            const tr = document.createElement('tr');
+            
+            columns.forEach(col => {
+                const td = document.createElement('td');
+                td.textContent = `Value ${i+1}`;
+                tr.appendChild(td);
+            });
+            
+            tbody.appendChild(tr);
+        }
+        
+        // Create pagination
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+        paginationControls.innerHTML = createPaginationControls(currentPage, totalPages);
+        
+        // Add pagination event listeners
+        paginationControls.querySelectorAll('.page-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // This would be replaced with actual pagination logic
+                console.log('Go to page:', this.dataset.page);
+            });
+        });
+    }
+
+    function createPaginationControls(currentPage, totalPages) {
+        let controls = `
+            <nav aria-label="Data preview pagination">
+                <ul class="pagination pagination-sm">
+                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>
+                    </li>
+        `;
+        
+        // Add page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            controls += `
+                <li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                </li>
+            `;
+        }
+        
+        controls += `
+                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        `;
+        
+        return controls;
+    }
+
+            // Column card click event
+            document.querySelectorAll('.column-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const column = this.dataset.column;
+                    showColumnDetails(column);
+                });
+            });
+            
+            // Filter form events
+            const filterForm = document.getElementById('filter-form');
+            const filterColumns = document.getElementById('filter-columns');
+            const filterOptions = document.getElementById('filter-options');
+            
+            filterColumns.addEventListener('change', function() {
+                // Clear previous filter options
+                filterOptions.innerHTML = '';
+                
+                // Add filter options for selected columns
+                Array.from(this.selectedOptions).forEach(option => {
+                    const column = option.value;
+                    addFilterOption(column);
+                });
+            });
+            
+            filterForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                applyFilters();
+            });
+            
+            document.getElementById('reset-filters').addEventListener('click', function() {
+                filterForm.reset();
+                filterOptions.innerHTML = '';
+                document.getElementById('filter-results').classList.add('d-none');
+            });
+            
+            document.getElementById('download-filtered').addEventListener('click', function() {
+                downloadFilteredData();
+            });
+            
+            // Functions
+            function showColumnDetails(column) {
+                const columnDetails = document.getElementById('column-details');
+                const columnAiInsights = document.getElementById('column-ai-insights');
+                const aiInsightsContent = document.getElementById('ai-insights-content');
+                
+                columnDetails.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                columnDetails.classList.remove('d-none');
+                
+                // Hide AI insights initially
+                columnAiInsights.classList.add('d-none');
+                
+                // Scroll to column details
+                columnDetails.scrollIntoView({ behavior: 'smooth' });
+                
+                // Fetch column data
+                fetch('/api/get_column_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ column: column }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        columnDetails.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                        return;
+                    }
+                    
+                    // Create column details content
+                    let content = `
+                        <h4>${column}</h4>
+                        <div class="row mb-4">
+                    `;
+                    
+                    // Add stats
+                    if (data.type === 'numeric') {
+                        content += `
+                            <div class="col-md-2">
+                                <div class="stat-card">
+                                    <div class="stat-label">Min</div>
+                                    <div class="stat-value">${data.stats.min}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="stat-card">
+                                    <div class="stat-label">Max</div>
+                                    <div class="stat-value">${data.stats.max}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="stat-card">
+                                    <div class="stat-label">Mean</div>
+                                    <div class="stat-value">${data.stats.mean.toFixed(2)}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="stat-card">
+                                    <div class="stat-label">Median</div>
+                                    <div class="stat-value">${data.stats.median.toFixed(2)}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="stat-card">
+                                    <div class="stat-label">Std Dev</div>
+                                    <div class="stat-value">${data.stats.std.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        content += `
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-label">Unique Values</div>
+                                    <div class="stat-value">${data.stats.unique}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-label">Most Common</div>
+                                    <div class="stat-value">${data.stats.top}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stat-card">
+                                    <div class="stat-label">Frequency</div>
+                                    <div class="stat-value">${data.stats.freq}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    content += `
+                        </div>
+                        <div id="column-chart" style="height: 400px;"></div>
+                        <div class="mt-3">
+                            <button class="btn btn-primary" id="get-ai-insights-btn">
+                                <i class="bi bi-lightbulb me-2"></i>Get AI Insights
+                            </button>
+                        </div>
+                    `;
+                    
+                    columnDetails.innerHTML = content;
+                    
+                    // Create chart
+                    if (data.type === 'numeric') {
+                        const trace = {
+                            x: data.data.bins.slice(0, -1).map((val, i) => (val + data.data.bins[i+1]) / 2),
+                            y: data.data.values,
+                            type: 'bar',
+                            marker: {
+                                color: '#4CAF50'
+                            }
+                        };
+                        
+                        const layout = {
+                            title: `Distribution of ${column}`,
+                            xaxis: { title: column },
+                            yaxis: { title: 'Frequency' }
+                        };
+                        
+                        Plotly.newPlot('column-chart', [trace], layout);
+                    } else {
+                        const trace = {
+                            x: data.data.labels,
+                            y: data.data.values,
+                            type: 'bar',
+                            marker: {
+                                color: '#4CAF50'
+                            }
+                        };
+                        
+                        const layout = {
+                            title: `Value Counts for ${column}`,
+                            xaxis: { title: column },
+                            yaxis: { title: 'Count' }
+                        };
+                        
+                        Plotly.newPlot('column-chart', [trace], layout);
+                    }
+                    
+                    // Add event listener for AI insights button
+                    document.getElementById('get-ai-insights-btn').addEventListener('click', function() {
+                        getAIInsightsForColumn(column);
+                    });
+                })
+                .catch(error => {
+                    columnDetails.innerHTML = `<div class="alert alert-danger">Error fetching column data: ${error}</div>`;
+                });
+            }
+            
+            function getAIInsightsForColumn(column) {
+                const columnAiInsights = document.getElementById('column-ai-insights');
+                const aiInsightsContent = document.getElementById('ai-insights-content');
+                
+                // Show loading
+                columnAiInsights.classList.remove('d-none');
+                aiInsightsContent.innerHTML = `
+                    <div class="ai-loading">
+                        <div class="spinner-border text-primary me-2" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span>Generating insights...</span>
+                    </div>
+                `;
+                
+                // Scroll to insights
+                columnAiInsights.scrollIntoView({ behavior: 'smooth' });
+                
+                // Fetch AI insights
+                fetch('/api/get_column_insights', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ column: column }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        aiInsightsContent.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                        return;
+                    }
+                    
+                    // Display insights
+                    let insightsHtml = '';
+                    if (data.insights && data.insights.length > 0) {
+                        data.insights.forEach(insight => {
+                            insightsHtml += `<div class="ai-insight-item">${insight}</div>`;
+                        });
+                    } else {
+                        insightsHtml = '<div class="alert alert-info">No specific insights could be generated for this column.</div>';
+                    }
+                    
+                    aiInsightsContent.innerHTML = insightsHtml;
+                })
+                .catch(error => {
+                    aiInsightsContent.innerHTML = `<div class="alert alert-danger">Error generating insights: ${error}</div>`;
+                });
+            }
+            
+            function addFilterOption(column) {
+                const filterOption = document.createElement('div');
+                filterOption.className = 'mb-3';
+                filterOption.innerHTML = `
+                    <label class="form-label">${column}</label>
+                    <div class="filter-controls" id="filter-${column}">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span class="ms-2">Loading filter options...</span>
+                    </div>
+                `;
+                
+                filterOptions.appendChild(filterOption);
+                
+                // Fetch column data to create appropriate filter controls
+                fetch('/api/get_column_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ column: column }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const filterControl = document.getElementById(`filter-${column}`);
+                    
+                    if (data.type === 'numeric') {
+                        // Create range slider for numeric columns
+                        const min = data.stats.min;
+                        const max = data.stats.max;
+                        
+                        filterControl.innerHTML = `
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Min</label>
+                                    <input type="number" class="form-control" name="filter-${column}-min" value="${min}" min="${min}" max="${max}" step="any">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Max</label>
+                                    <input type="number" class="form-control" name="filter-${column}-max" value="${max}" min="${min}" max="${max}" step="any">
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Create multi-select for categorical columns
+                        const options = data.data.labels.map(label => 
+                            `<option value="${label}">${label}</option>`
+                        ).join('');
+                        
+                        filterControl.innerHTML = `
+                            <select class="form-select" name="filter-${column}-values" multiple>
+                                ${options}
+                            </select>
+                            <div class="form-text">Hold Ctrl/Cmd to select multiple values</div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    const filterControl = document.getElementById(`filter-${column}`);
+                    filterControl.innerHTML = `<div class="alert alert-danger">Error loading filter options: ${error}</div>`;
+                });
+            }
+            
+            function applyFilters() {
+                const filters = {};
+                
+                // Collect filter values
+                Array.from(filterColumns.selectedOptions).forEach(option => {
+                    const column = option.value;
+                    
+                    // Check if numeric filter
+                    const minInput = document.querySelector(`[name="filter-${column}-min"]`);
+                    const maxInput = document.querySelector(`[name="filter-${column}-max"]`);
+                    
+                    if (minInput && maxInput) {
+                        filters[column] = {
+                            min: parseFloat(minInput.value),
+                            max: parseFloat(maxInput.value)
+                        };
+                    } else {
+                        // Must be categorical filter
+                        const valuesSelect = document.querySelector(`[name="filter-${column}-values"]`);
+                        if (valuesSelect) {
+                            const selectedValues = Array.from(valuesSelect.selectedOptions).map(opt => opt.value);
+                            if (selectedValues.length > 0) {
+                                filters[column] = {
+                                    values: selectedValues
+                                };
+                            }
+                        }
+                    }
+                });
+                
+                // Apply filters
+                fetch('/api/filter_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ filters: filters }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(`Error applying filters: ${data.error}`);
+                        return;
+                    }
+                    
+                    // Show results
+                    document.getElementById('filter-results').classList.remove('d-none');
+                    document.getElementById('filtered-count').textContent = `Filtered data: ${data.rows} rows`;
+                    
+                    // Create table
+                    const table = document.getElementById('filtered-table');
+                    const thead = table.querySelector('thead tr');
+                    const tbody = table.querySelector('tbody');
+                    
+                    // Clear previous content
+                    thead.innerHTML = '';
+                    tbody.innerHTML = '';
+                    
+                    // Add headers
+                    if (data.sample.length > 0) {
+                        Object.keys(data.sample[0]).forEach(key => {
+                            const th = document.createElement('th');
+                            th.textContent = key;
+                            thead.appendChild(th);
+                        });
+                        
+                        // Add rows
+                        data.sample.forEach(row => {
+                            const tr = document.createElement('tr');
+                            
+                            Object.values(row).forEach(value => {
+                                const td = document.createElement('td');
+                                td.textContent = value;
+                                tr.appendChild(td);
+                            });
+                            
+                            tbody.appendChild(tr);
+                        });
+                    }
+                })
+                .catch(error => {
+                    alert(`Error applying filters: ${error}`);
+                });
+            }
+            
+            function downloadFilteredData() {
+                // Collect filter values
+                const filters = {};
+                
+                Array.from(filterColumns.selectedOptions).forEach(option => {
+                    const column = option.value;
+                    
+                    // Check if numeric filter
+                    const minInput = document.querySelector(`[name="filter-${column}-min"]`);
+                    const maxInput = document.querySelector(`[name="filter-${column}-max"]`);
+                    
+                    if (minInput && maxInput) {
+                        filters[column] = {
+                            min: parseFloat(minInput.value),
+                            max: parseFloat(maxInput.value)
+                        };
+                    } else {
+                        // Must be categorical filter
+                        const valuesSelect = document.querySelector(`[name="filter-${column}-values"]`);
+                        if (valuesSelect) {
+                            const selectedValues = Array.from(valuesSelect.selectedOptions).map(opt => opt.value);
+                            if (selectedValues.length > 0) {
+                                filters[column] = {
+                                    values: selectedValues
+                                };
+                            }
+                        }
+                    }
+                });
+                
+                // Create form for download
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/api/download_filtered';
+                form.style.display = 'none';
+                
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'filters';
+                input.value = JSON.stringify(filters);
+                
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+                document.body.removeChild(form);
+            }
+        });
+    </script>
+</body>
+</html>
+

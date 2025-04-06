@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Viz - Visualizations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --accent-color: #81C784;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
+        
+        .navbar {
+            background-color: var(--dark-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary-color) !important;
+        }
+        
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-header {
+            background-color: var(--dark-bg);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+        
+        .viz-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            height: 100%;
+            transition: transform 0.2s;
+        }
+        
+        .viz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .viz-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-bg);
+        }
+        
+        .viz-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        .viz-container {
+            height: 400px;
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+        }
+        
+        /* LLM Chart Ideas */
+        .chart-idea-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            cursor: pointer;
+            height: 100%;
+        }
+        
+        .chart-idea-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .chart-idea-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-bg);
+        }
+        
+        .chart-idea-type {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .chart-idea-description {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        .chart-idea-columns {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color) !important;
+            border-color: #dee2e6 #dee2e6 #fff;
+            font-weight: 600;
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text-color) !important;
+        }
+        
+        /* Generated chart styles */
+        .generated-chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            height: 100%;
+        }
+        
+        .chart-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        
+        .chart-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+        
+        /* Visualization filters */
+        .filter-badge {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-badge:hover, .filter-badge.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bar-chart-fill me-2"></i>
+                Data Viz
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/explorer">Data Explorer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/visualizations">Visualizations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/insights">Insights</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/custom">Custom Charts</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-6">
+                <h1 class="mb-0">Visualizations</h1>
+                <p class="text-muted">Explore your data through interactive charts</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="/custom" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Create Custom Chart
+                </a>
+            </div>
+        </div>
+        
+        <!-- Visualization Filters -->
+        <div class="mb-4">
+            <h5 class="mb-3">Filter by Chart Type:</h5>
+            <div id="chart-type-filters">
+                <span class="filter-badge active" data-filter="all">All Types</span>
+                <span class="filter-badge" data-filter="bar">Bar Charts</span>
+                <span class="filter-badge" data-filter="line">Line Charts</span>
+                <span class="filter-badge" data-filter="scatter">Scatter Plots</span>
+                <span class="filter-badge" data-filter="pie">Pie Charts</span>
+                <span class="filter-badge" data-filter="box">Box Plots</span>
+                <span class="filter-badge" data-filter="heatmap">Heatmaps</span>
+                <span class="filter-badge" data-filter="histogram">Histograms</span>
+            </div>
+        </div>
+        
+        <!-- Tabs for different visualization sections -->
+        <ul class="nav nav-tabs mb-4" id="vizTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="recommended-tab" data-bs-toggle="tab" data-bs-target="#recommended" type="button" role="tab">
+                    <i class="bi bi-star me-1"></i>Recommended
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="ai-generated-tab" data-bs-toggle="tab" data-bs-target="#ai-generated" type="button" role="tab">
+                    <i class="bi bi-lightbulb me-1"></i>AI-Generated
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="generated-tab" data-bs-toggle="tab" data-bs-target="#generated" type="button" role="tab">
+                    <i class="bi bi-collection me-1"></i>My Charts
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="vizTabsContent">
+            <!-- Recommended Visualizations Tab -->
+            <div class="tab-pane fade show active" id="recommended" role="tabpanel">
+                <p class="lead mb-4">Based on your data, here are the most insightful visualizations to help you understand patterns and relationships.</p>
+                
+                <div class="row" id="viz-container">
+                    {% if recommendations %}
+                        {% for i in range(0, recommendations|length, 2) %}
+                            <div class="col-md-6 mb-4 viz-item" data-type="{{ recommendations[i].type }}">
+                                <div class="viz-card">
+                                    <span class="badge bg-primary chart-badge">{{ recommendations[i].type }}</span>
+                                    <div class="viz-title">{{ recommendations[i].title }}</div>
+                                    <div class="viz-description">{{ recommendations[i].description }}</div>
+                                    <div class="viz-container" id="viz-{{ i }}">
+                                        <div class="loading-spinner">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-actions">
+                                        <button class="btn btn-sm btn-outline-primary download-btn" data-viz="{{ i }}">
+                                            <i class="bi bi-download me-1"></i>Download
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary fullscreen-btn" data-viz="{{ i }}">
+                                            <i class="bi bi-arrows-fullscreen me-1"></i>Fullscreen
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if i + 1 < recommendations|length %}
+                            <div class="col-md-6 mb-4 viz-item" data-type="{{ recommendations[i+1].type }}">
+                                <div class="viz-card">
+                                    <span class="badge bg-primary chart-badge">{{ recommendations[i+1].type }}</span>
+                                    <div class="viz-title">{{ recommendations[i+1].title }}</div>
+                                    <div class="viz-description">{{ recommendations[i+1].description }}</div>
+                                    <div class="viz-container" id="viz-{{ i+1 }}">
+                                        <div class="loading-spinner">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="chart-actions">
+                                        <button class="btn btn-sm btn-outline-primary download-btn" data-viz="{{ i+1 }}">
+                                            <i class="bi bi-download me-1"></i>Download
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary fullscreen-btn" data-viz="{{ i+1 }}">
+                                            <i class="bi bi-arrows-fullscreen me-1"></i>Fullscreen
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                No visualization recommendations available. Please upload a dataset first.
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- AI-Generated Visualizations Tab -->
+            <div class="tab-pane fade" id="ai-generated" role="tabpanel">
+                <p class="lead mb-4">Our AI has analyzed your data and generated these visualization ideas to help you gain deeper insights.</p>
+                
+                <div class="row">
+                    {% if llm_chart_ideas %}
+                        {% for idea in llm_chart_ideas %}
+                        <div class="col-md-6 mb-4 viz-item" data-type="{{ idea.type }}">
+                            <div class="chart-idea-card">
+                                <span class="badge bg-success chart-badge">AI</span>
+                                <div class="chart-idea-title">{{ idea.title }}</div>
+                                <div class="chart-idea-type">{{ idea.type }}</div>
+                                <div class="chart-idea-description">{{ idea.description }}</div>
+                                <div class="chart-idea-columns">
+                                    <strong>Columns:</strong> {{ idea.columns|join(', ') }}
+                                </div>
+                                <button class="btn btn-sm btn-primary mt-2 generate-chart-btn" data-idea-index="{{ loop.index0 }}">
+                                    <i class="bi bi-graph-up me-1"></i>Generate Chart
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                No AI-generated chart ideas available. This might be due to limited data or API configuration.
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Generated Charts Tab -->
+            <div class="tab-pane fade" id="generated" role="tabpanel">
+                <p class="lead mb-4">Your generated charts will appear here. Generate charts from the AI suggestions to see them in this section.</p>
+                
+                <div class="row" id="generated-charts-container">
+                    <!-- Generated charts will be added here dynamically -->
+                    <div class="col-12" id="no-generated-charts">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            No charts generated yet. Click "Generate Chart" on any AI suggestion to create a chart.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chart Preview Modal -->
+        <div class="modal fade" id="chartPreviewModal" tabindex="-1" aria-labelledby="chartPreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="chartPreviewModalLabel">Chart Preview</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="chart-preview-container" style="height: 600px;"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="save-to-my-charts-btn">
+                            <i class="bi bi-save me-1"></i>Save to My Charts
+                        </button>
+                        <button type="button" class="btn btn-success" id="download-preview-btn">
+                            <i class="bi bi-download me-1"></i>Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load recommended visualizations
+            {% if recommendations %}
+                {% for i in range(recommendations|length) %}
+                    loadVisualization({{ i }}, {{ recommendations[i]|tojson }});
+                {% endfor %}
+            {% endif %}
+            
+            // Download button click events
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const vizIndex = this.dataset.viz;
+                    downloadVisualization(vizIndex);
+                });
+            });
+            
+            // Fullscreen button click events
+            document.querySelectorAll('.fullscreen-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const vizIndex = this.dataset.viz;
+                    const vizElement = document.getElementById(`viz-${vizIndex}`);
+                    
+                    if (vizElement && vizElement._fullLayout) {
+                        // Show in modal
+                        const chartPreviewModal = new bootstrap.Modal(document.getElementById('chartPreviewModal'));
+                        const chartPreviewContainer = document.getElementById('chart-preview-container');
+                        const chartPreviewModalLabel = document.getElementById('chartPreviewModalLabel');
+                        
+                        // Set modal title
+                        const vizCard = this.closest('.viz-card');
+                        const title = vizCard.querySelector('.viz-title').textContent;
+                        chartPreviewModalLabel.textContent = title;
+                        
+                        // Clone the visualization to the modal
+                        Plotly.newPlot(
+                            chartPreviewContainer, 
+                            vizElement._fullData, 
+                            vizElement._fullLayout
+                        );
+                        
+                        // Show modal
+                        chartPreviewModal.show();
+                    }
+                });
+            });
+            
+            // AI-generated chart buttons
+            const generateChartBtns = document.querySelectorAll('.generate-chart-btn');
+            const chartPreviewModal = new bootstrap.Modal(document.getElementById('chartPreviewModal'));
+            const chartPreviewContainer = document.getElementById('chart-preview-container');
+            const chartPreviewModalLabel = document.getElementById('chartPreviewModalLabel');
+            const saveToMyChartsBtn = document.getElementById('save-to-my-charts-btn');
+            const downloadPreviewBtn = document.getElementById('download-preview-btn');
+            
+            // Store current chart data
+            let currentChartData = null;
+            let currentChartTitle = '';
+            let currentChartType = '';
+            
+            generateChartBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const ideaIndex = this.dataset.ideaIndex;
+                    const card = this.closest('.chart-idea-card');
+                    const title = card.querySelector('.chart-idea-title').textContent;
+                    const type = card.querySelector('.chart-idea-type').textContent;
+                    
+                    // Update chart title
+                    chartPreviewModalLabel.textContent = title;
+                    currentChartTitle = title;
+                    currentChartType = type;
+                    
+                    // Show loading in chart container
+                    chartPreviewContainer.innerHTML = `
+                        <div class="d-flex justify-content-center align-items-center" style="height: 100%;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Show preview
+                    chartPreviewModal.show();
+                    
+                    // Generate chart
+                    fetch('/api/create_llm_viz', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ idea_index: ideaIndex }),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.error) {
+                            // Show error
+                            chartPreviewContainer.innerHTML = `
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    ${data.error}
+                                </div>
+                            `;
+                            return;
+                        }
+                        
+                        if (data.success) {
+                            // Store chart data
+                            currentChartData = data.data;
+                            
+                            // Render the chart
+                            Plotly.newPlot(chartPreviewContainer, data.data.data, data.data.layout);
+                        } else {
+                            // Show error
+                            chartPreviewContainer.innerHTML = `
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Failed to create visualization
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => {
+                        // Show error
+                        chartPreviewContainer.innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                Error generating chart: ${error.message || error}
+                            </div>
+                        `;
+                        console.error('Error:', error);
+                    });
+                });
+            });
+            
+            // Save to My Charts button
+            saveToMyChartsBtn.addEventListener('click', function() {
+                if (!currentChartData) return;
+                
+                // Add to My Charts tab
+                const generatedChartsContainer = document.getElementById('generated-charts-container');
+                const noGeneratedCharts = document.getElementById('no-generated-charts');
+                
+                // Hide "no charts" message
+                if (noGeneratedCharts) {
+                    noGeneratedCharts.style.display = 'none';
+                }
+                
+                // Create unique ID for the chart
+                const chartId = 'generated-chart-' + Date.now();
+                
+                // Create chart card
+                const chartCard = document.createElement('div');
+                chartCard.className = 'col-md-6 mb-4 viz-item';
+                chartCard.dataset.type = currentChartType.toLowerCase();
+                chartCard.innerHTML = `
+                    <div class="generated-chart-container">
+                        <span class="badge bg-success chart-badge">Generated</span>
+                        <div class="viz-title">${currentChartTitle}</div>
+                        <div id="${chartId}" style="height: 400px;"></div>
+                        <div class="chart-actions">
+                            <button class="btn btn-sm btn-outline-primary download-generated-btn">
+                                <i class="bi bi-download me-1"></i>Download
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger remove-chart-btn">
+                                <i class="bi bi-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add to container
+                generatedChartsContainer.appendChild(chartCard);
+                
+                // Render chart
+                Plotly.newPlot(chartId, currentChartData.data, currentChartData.layout);
+                
+                // Add event listeners
+                const downloadBtn = chartCard.querySelector('.download-generated-btn');
+                downloadBtn.addEventListener('click', function() {
+                    const chartElement = document.getElementById(chartId);
+                    if (chartElement && chartElement._fullLayout) {
+                        Plotly.downloadImage(chartElement, {
+                            format: 'png',
+                            filename: currentChartTitle.replace(/\s+/g, '_').toLowerCase(),
+                            width: 1200,
+                            height: 800
+                        });
+                    }
+                });
+                
+                const removeBtn = chartCard.querySelector('.remove-chart-btn');
+                removeBtn.addEventListener('click', function() {
+                    chartCard.remove();
+                    
+                    // Show "no charts" message if no charts left
+                    if (generatedChartsContainer.querySelectorAll('.viz-item').length === 0) {
+                        noGeneratedCharts.style.display = 'block';
+                    }
+                });
+                
+                // Switch to My Charts tab
+                document.getElementById('generated-tab').click();
+                
+                // Close modal
+                chartPreviewModal.hide();
+            });
+            
+            // Download preview button
+            downloadPreviewBtn.addEventListener('click', function() {
+                if (chartPreviewContainer && chartPreviewContainer._fullLayout) {
+                    Plotly.downloadImage(chartPreviewContainer, {
+                        format: 'png',
+                        filename: currentChartTitle.replace(/\s+/g, '_').toLowerCase(),
+                        width: 1200,
+                        height: 800
+                    });
+                }
+            });
+            
+            // Chart type filters
+            const filterBadges = document.querySelectorAll('.filter-badge');
+            const vizItems = document.querySelectorAll('.viz-item');
+            
+            filterBadges.forEach(badge => {
+                badge.addEventListener('click', function() {
+                    // Remove active class from all badges
+                    filterBadges.forEach(b => b.classList.remove('active'));
+                    
+                    // Add active class to clicked badge
+                    this.classList.add('active');
+                    
+                    // Get filter value
+                    const filter = this.dataset.filter;
+                    
+                    // Filter visualization items
+                    vizItems.forEach(item => {
+                        if (filter === 'all' || item.dataset.type.includes(filter)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Functions
+            function loadVisualization(index, config) {
+                fetch('/api/get_visualization', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: config.type,
+                        config: config
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById(`viz-${index}`).innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                ${data.error}
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Render the visualization
+                    Plotly.newPlot(`viz-${index}`, data.data.data, data.data.layout);
+                })
+                .catch(error => {
+                    document.getElementById(`viz-${index}`).innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            Error loading visualization: ${error}
+                        </div>
+                    `;
+                });
+            }
+            
+            function downloadVisualization(index) {
+                const vizElement = document.getElementById(`viz-${index}`);
+                
+                if (vizElement && vizElement._fullLayout) {
+                    Plotly.downloadImage(vizElement, {
+                        format: 'png',
+                        filename: `visualization-${index}`,
+                        width: 1200,
+                        height: 800
+                    });
+                } else {
+                    alert('Visualization not ready for download. Please try again in a moment.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
