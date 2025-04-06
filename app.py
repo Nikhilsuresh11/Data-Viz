@@ -1,3 +1,5 @@
+# install requirements.txt 
+# TOGETHER_API_KEY = " " add in .env and you are good to go
 from flask import Flask, render_template, request, jsonify, send_file, session, redirect, url_for
 import pandas as pd
 import numpy as np

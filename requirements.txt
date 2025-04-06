@@ -1,0 +1,14 @@
+Flask
+pandas
+numpy
+matplotlib
+seaborn
+plotly
+scikit-learn
+Werkzeug
+together
+tabula-py
+PyPDF2
+python-docx
+requests
+beautifulsoup4
