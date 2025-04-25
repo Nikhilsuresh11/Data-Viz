@@ -1,6 +1,6 @@
 # Data Visualization App
 
-A Streamlit-based data visualization and analysis application that allows users to upload data files, explore datasets, create visualizations, and gain insights.
+A Flask-based data visualization and analysis application that allows users to upload data files, explore datasets, create visualizations, and gain insights.
 
 ## Features
 
