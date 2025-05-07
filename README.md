@@ -12,7 +12,6 @@ A Flask-based data visualization and analysis application that allows users to u
 - **Custom Analysis**: Advanced filtering, custom charts, and statistical tests
 
 
-![image](https://github.com/user-attachments/assets/9ff4a0b3-c7e3-4545-a0ee-e4efc24132d5)
 
 ### Data Preview
 ![image](https://github.com/user-attachments/assets/2bff1942-1b9c-4855-855f-342d424312f6)
@@ -26,4 +25,4 @@ A Flask-based data visualization and analysis application that allows users to u
 ![image](https://github.com/user-attachments/assets/8ac24ef1-b97e-4159-bb5b-541463de0f45)
 
 
-![Uploading image.png…]()
+![image](https://github.com/user-attachments/assets/9ff4a0b3-c7e3-4545-a0ee-e4efc24132d5)
