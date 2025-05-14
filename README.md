@@ -24,5 +24,3 @@ A Flask-based data visualization and analysis application that allows users to u
 
 ![image](https://github.com/user-attachments/assets/8ac24ef1-b97e-4159-bb5b-541463de0f45)
 
-
-![image](https://github.com/user-attachments/assets/9ff4a0b3-c7e3-4545-a0ee-e4efc24132d5)
