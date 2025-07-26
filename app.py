@@ -29,6 +29,10 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import tempfile
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = 'data_viz_secret_key'
@@ -51,26 +55,58 @@ def analyze_column_types(df):
     column_types = {}
     
     for col in df.columns:
-        # Check if datetime
-        try:
-            if pd.api.types.is_datetime64_any_dtype(df[col]) or pd.to_datetime(df[col], errors='coerce').notna().all():
-                column_types[col] = "datetime"
-                continue
-        except:
-            pass
+        # First check if already datetime dtype
+        if pd.api.types.is_datetime64_any_dtype(df[col]):
+            column_types[col] = "datetime"
+            continue
             
-        # Check if numeric
+        # Check if numeric first (most reliable)
         if pd.api.types.is_numeric_dtype(df[col]):
             # Check if binary (0/1)
-            if set(df[col].dropna().unique()).issubset({0, 1}):
+            unique_vals = set(df[col].dropna().unique())
+            if unique_vals.issubset({0, 1}) and len(unique_vals) <= 2:
                 column_types[col] = "binary"
             # Check if likely ID column
             elif ("id" in col.lower() or "key" in col.lower()) and df[col].nunique() > 0.9 * len(df):
                 column_types[col] = "id"
             else:
                 column_types[col] = "numeric"
-        # Check if categorical
-        elif df[col].nunique() < min(0.2 * len(df), 50):
+            continue
+        
+        # Try to convert to numeric if it looks like numbers stored as strings
+        try:
+            numeric_converted = pd.to_numeric(df[col], errors='coerce')
+            if numeric_converted.notna().sum() > 0.8 * len(df[col].dropna()):
+                column_types[col] = "numeric"
+                continue
+        except:
+            pass
+            
+        # Check if datetime (only for non-numeric columns)
+        try:
+            # More conservative datetime detection
+            if df[col].dtype == 'object':
+                # Sample a few values to check if they look like dates
+                sample_vals = df[col].dropna().head(10).astype(str)
+                datetime_count = 0
+                for val in sample_vals:
+                    try:
+                        parsed = pd.to_datetime(val, errors='raise')
+                        # Check if it's a reasonable date (not just numbers)
+                        if parsed.year > 1900 and parsed.year < 2100:
+                            datetime_count += 1
+                    except:
+                        pass
+                
+                # If most samples look like dates, treat as datetime
+                if datetime_count >= len(sample_vals) * 0.7 and datetime_count > 0:
+                    column_types[col] = "datetime"
+                    continue
+        except:
+            pass
+            
+        # Check if categorical (low cardinality)
+        if df[col].nunique() < min(0.2 * len(df), 50):
             column_types[col] = "categorical"
         # Must be text
         else:
