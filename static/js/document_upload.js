@@ -219,9 +219,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return
           }
   
-          if (data.success && data.redirect) {
+          if (data.message && data.message === 'Table processed successfully') {
             // Redirect to the overview page
-            window.location.href = data.redirect
+            window.location.href = '/overview'
           } else {
             showError("Error processing table.")
           }

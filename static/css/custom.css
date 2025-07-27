@@ -1,0 +1,223 @@
+:root {
+  --primary-color: #4caf50;
+  --secondary-color: #2e7d32;
+  --accent-color: #81c784;
+  --light-bg: #f8f9fa;
+  --dark-bg: #212529;
+  --text-color: #333;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--light-bg);
+  color: var(--text-color);
+}
+
+.navbar {
+  background-color: var(--dark-bg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  font-weight: bold;
+  color: var(--primary-color) !important;
+}
+
+.nav-link {
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.nav-link.active {
+  color: var(--primary-color) !important;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.card {
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  border: none;
+}
+
+.card-header {
+  background-color: var(--dark-bg);
+  color: white;
+  border-radius: 10px 10px 0 0 !important;
+  padding: 15px 20px;
+  font-weight: 600;
+}
+
+.chart-type-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  height: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chart-type-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chart-type-card.selected {
+  border: 2px solid var(--primary-color);
+  background-color: rgba(76, 175, 80, 0.05);
+}
+
+.chart-icon {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.chart-builder {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.chart-preview {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  min-height: 500px;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+}
+
+.chart-recommendation {
+  margin-top: 10px;
+}
+
+.column-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.column-card:hover {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.column-card.selected {
+  background-color: rgba(76, 175, 80, 0.2);
+  border-left: 3px solid var(--primary-color);
+}
+
+.column-type {
+  display: inline-block;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+.column-type.numeric {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.column-type.categorical {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.column-type.datetime {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.chart-idea-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.chart-idea-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chart-idea-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--dark-bg);
+}
+
+.chart-idea-type {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+}
+
+.chart-idea-description {
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.chart-idea-columns {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.drag-column-container {
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  min-height: 100px;
+  margin-bottom: 15px;
+}
+
+.drag-column-container.active {
+  border-color: var(--primary-color);
+  background-color: rgba(76, 175, 80, 0.05);
+}
+
+.draggable-column {
+  background-color: #e9ecef;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 5px;
+  display: inline-block;
+  cursor: grab;
+}
+
+.draggable-column .remove-btn {
+  margin-left: 5px;
+  cursor: pointer;
+}

@@ -189,7 +189,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="/">
-                <i class="bi bi-bar-chart-fill me-2"></i>
+                <i class="bi bi-pie-chart-fill"></i>
                 Data Viz
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -247,7 +247,7 @@
                         </div>
                         <div class="d-flex justify-content-between">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-funnel-fill me-2"></i>Apply Filters
+                                <i class="bi bi-funnel-fill me-2"></i>Click to Apply Filters
                             </button>
                             <button type="button" id="reset-filters" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-counterclockwise me-2"></i>Reset Filters
@@ -356,14 +356,9 @@
             <div class="col-md-9">
                 <!-- Column Type Tabs -->
                 <ul class="nav nav-tabs mb-4" id="columnTypeTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
-                            All Columns
-                        </button>
-                    </li>
                     {% for type, columns in columns_by_type.items() %}
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="{{ type }}-tab" data-bs-toggle="tab" data-bs-target="#{{ type }}" type="button" role="tab">
+                        <button class="nav-link {% if loop.first %}active{% endif %}" id="{{ type }}-tab" data-bs-toggle="tab" data-bs-target="#{{ type }}" type="button" role="tab">
                             {{ type|capitalize }} ({{ columns|length }})
                         </button>
                     </li>
@@ -372,51 +367,10 @@
                 
                 <!-- Column Type Tab Content -->
                 <div class="tab-content" id="columnTypeContent">
-                    <!-- All Columns Tab -->
-                    <div class="tab-pane fade show active" id="all" role="tabpanel">
-                        <div class="row">
-                            {% for col in column_names %}
-                            <div class="col-md-4 mb-4 column-card-wrapper" 
-                                 data-column="{{ col }}" 
-                                 data-type="{{ column_types[col] }}" 
-                                 data-missing="{{ stats[col].missing_pct }}">
-                                <div class="column-card">
-                                    <span class="column-type-badge">{{ column_types[col] }}</span>
-                                    <h5>{{ col }}</h5>
-                                    <p class="text-muted mb-0">
-                                        {% if stats[col].missing_pct > 0 %}
-                                        <span class="text-warning">
-                                            <i class="bi bi-exclamation-triangle me-1"></i>
-                                            {{ stats[col].missing_pct|round(1) }}% missing
-                                        </span>
-                                        {% else %}
-                                        <span class="text-success">
-                                            <i class="bi bi-check-circle me-1"></i>
-                                            No missing values
-                                        </span>
-                                        {% endif %}
-                                    </p>
-                                    <p class="text-muted mb-0">
-                                        <i class="bi bi-hash me-1"></i>
-                                        {{ stats[col].unique_count }} unique values
-                                    </p>
-                                    <div class="mt-2">
-                                        <button class="btn btn-sm btn-primary view-column-btn">
-                                            <i class="bi bi-info-circle me-1"></i>View Details
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-secondary correlations-btn" title="Find correlations">
-                                            <i class="bi bi-link-45deg"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
                     
                     <!-- Specific Column Type Tabs -->
                     {% for type, columns in columns_by_type.items() %}
-                    <div class="tab-pane fade" id="{{ type }}" role="tabpanel">
+                    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="{{ type }}" role="tabpanel">
                         <div class="row">
                             {% for col in columns %}
                             <div class="col-md-4 mb-4">
@@ -494,52 +448,7 @@
         </div>
         
         <!-- Data Preview Panel -->
-        <div id="data-preview-panel" class="mt-4">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <div>
-                        <i class="bi bi-table me-2"></i>
-                        Data Preview
-                    </div>
-                    <div>
-                        <button class="btn btn-sm btn-outline-light" id="data-transformation-btn">
-                            <i class="bi bi-gear me-1"></i>Transformations
-                        </button>
-                        <button class="btn btn-sm btn-outline-light ms-2" id="export-data-btn">
-                            <i class="bi bi-download me-1"></i>Export
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover" id="data-preview-table">
-                            <thead>
-                                <tr>
-                                    <!-- Table headers dynamically populated -->
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Table rows dynamically populated -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div>
-                            <select class="form-select form-select-sm d-inline-block" id="rows-per-page" style="width: 80px;">
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                            <span class="ms-2">rows per page</span>
-                        </div>
-                        <div id="pagination-controls">
-                            <!-- Pagination controls dynamically populated -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {# Removed the Data Preview panel as requested #}
         
         <!-- Data Transformation Modal -->
         <div class="modal fade" id="transformationModal" tabindex="-1" aria-labelledby="transformationModalLabel" aria-hidden="true">
@@ -754,93 +663,20 @@
         });
     });
     
-    // Data transformation button
-    const dataTransformationBtn = document.getElementById('data-transformation-btn');
-    const transformationModal = new bootstrap.Modal(document.getElementById('transformationModal'));
-    
-    dataTransformationBtn.addEventListener('click', function() {
-        transformationModal.show();
-    });
-    
-    // Initialize the data preview table
-    initializeDataPreview();
-    
-    function initializeDataPreview() {
-        const table = document.getElementById('data-preview-table');
-        const thead = table.querySelector('thead tr');
-        const tbody = table.querySelector('tbody');
-        const paginationControls = document.getElementById('pagination-controls');
-        
-        // Example data generation - this would be replaced with actual API call
-        const columns = {{ column_names|tojson }};
-        const rowsPerPage = 10;
-        const totalRows = 100; // Example total count
-        const currentPage = 1;
-        
-        // Create table headers
-        thead.innerHTML = '';
-        columns.forEach(col => {
-            const th = document.createElement('th');
-            th.textContent = col;
-            thead.appendChild(th);
-        });
-        
-        // Create sample rows
-        tbody.innerHTML = '';
-        for (let i = 0; i < rowsPerPage; i++) {
-            const tr = document.createElement('tr');
-            
-            columns.forEach(col => {
-                const td = document.createElement('td');
-                td.textContent = `Value ${i+1}`;
-                tr.appendChild(td);
-            });
-            
-            tbody.appendChild(tr);
-        }
-        
-        // Create pagination
-        const totalPages = Math.ceil(totalRows / rowsPerPage);
-        paginationControls.innerHTML = createPaginationControls(currentPage, totalPages);
-        
-        // Add pagination event listeners
-        paginationControls.querySelectorAll('.page-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                // This would be replaced with actual pagination logic
-                console.log('Go to page:', this.dataset.page);
-            });
-        });
-    }
-
-    function createPaginationControls(currentPage, totalPages) {
-        let controls = `
-            <nav aria-label="Data preview pagination">
-                <ul class="pagination pagination-sm">
-                    <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>
-                    </li>
-        `;
-        
-        // Add page numbers
-        for (let i = 1; i <= totalPages; i++) {
-            controls += `
-                <li class="page-item ${i === currentPage ? 'active' : ''}">
-                    <a class="page-link" href="#" data-page="${i}">${i}</a>
-                </li>
-            `;
-        }
-        
-        controls += `
-                    <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>
-                    </li>
-                </ul>
-            </nav>
-        `;
-        
-        return controls;
-    }
+    // Data transformation button (removed since Data Preview panel is gone)
+    // const dataTransformationBtn = document.getElementById('data-transformation-btn');
+    // const transformationModal = new bootstrap.Modal(document.getElementById('transformationModal'));
+    // if (dataTransformationBtn) {
+    //     dataTransformationBtn.addEventListener('click', function() {
+    //         transformationModal.show();
+    //     });
+    // }
+    //
+    // initializeDataPreview();
+    // function initializeDataPreview() { ... }
+    // function createPaginationControls(currentPage, totalPages) { ... }
+    //
+    // All code related to data-preview-panel, data-preview-table, rows-per-page, pagination-controls, data-transformation-btn, export-data-btn has been removed.
 
             // Column card click event
             document.querySelectorAll('.column-card').forEach(card => {
