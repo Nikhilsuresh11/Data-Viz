@@ -18,8 +18,8 @@ app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = config.MAX_CONTENT_LENGTH
 
-# Enable CORS for Next.js frontend
-CORS(app, supports_credentials=True)
+# Enable CORS for Next.js frontend with explicit origin
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}}, supports_credentials=True)
 
 # Health check endpoint
 @app.route('/health', methods=['GET'])
@@ -92,6 +92,15 @@ def analyze_data():
         session['stats'] = result['stats']
         session['correlations'] = result['correlations']
         session['potential_targets'] = result['potential_targets']
+        
+        # Store dataset info for LLM context
+        df_info = f"""Dataset Information:
+- Rows: {result['rows']}
+- Columns: {result['columns']}
+- Column Names: {', '.join(result['column_names'])}
+- Column Types: {', '.join([f"{col} ({dtype})" for col, dtype in result['column_types'].items()])}
+"""
+        session['df_info'] = df_info
         
         # Cleanup
         force_garbage_collection()
