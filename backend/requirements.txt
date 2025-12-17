@@ -15,3 +15,5 @@ beautifulsoup4
 python-dotenv
 openpyxl
 lxml
+flask-cors
+psutil

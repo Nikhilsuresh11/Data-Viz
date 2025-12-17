@@ -1,1 +1,1 @@
-web: streamlit run streamlit_app.py 
+web: cd backend && gunicorn app:app
