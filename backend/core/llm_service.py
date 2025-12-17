@@ -27,7 +27,7 @@ def generate_llm_insights_lazy(file_path: str) -> list:
         pd = get_pandas()
         
         # Import original functions
-        from app import (
+        from original_app import (
             analyze_column_types,
             get_column_stats,
             identify_correlations,
@@ -79,7 +79,7 @@ def generate_llm_chart_ideas_lazy(file_path: str) -> list:
         pd = get_pandas()
         
         # Import original functions
-        from app import analyze_column_types, generate_llm_chart_ideas
+        from original_app import analyze_column_types, generate_llm_chart_ideas
         
         try:
             # Load data
@@ -118,7 +118,7 @@ def chat_with_llm_lazy(question: str, df_info: str) -> str:
     
     with MemoryMonitor("LLM Chat"):
         # Import original function
-        from app import get_llm_response_for_chat
+        from original_app import get_llm_response_for_chat
         
         try:
             response = get_llm_response_for_chat(question, df_info)
@@ -145,7 +145,7 @@ def get_column_insights_lazy(file_path: str, column: str) -> list:
         pd = get_pandas()
         
         # Import original functions
-        from app import analyze_column_types, get_column_stats, generate_llm_column_insights
+        from original_app import analyze_column_types, get_column_stats, generate_llm_column_insights
         
         try:
             # Load data

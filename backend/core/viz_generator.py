@@ -27,7 +27,7 @@ def create_visualization_lazy(file_path: str, viz_type: str, viz_config: dict) -
         pd = get_pandas()
         
         # Import original visualization function
-        from app import create_visualization
+        from original_app import create_visualization
         
         try:
             # Load data
@@ -67,7 +67,7 @@ def generate_recommendations_lazy(file_path: str) -> list:
         pd = get_pandas()
         
         # Import original functions
-        from app import (
+        from original_app import (
             analyze_column_types,
             get_column_stats,
             identify_correlations,

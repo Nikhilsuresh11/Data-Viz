@@ -25,8 +25,8 @@ def analyze_data_lazy(file_path: str) -> dict:
         # Lazy import pandas
         pd = get_pandas()
         
-        # Import original functions from app.py
-        from app import (
+        # Import original functions from original_app.py
+        from original_app import (
             analyze_column_types,
             get_column_stats,
             identify_correlations,
