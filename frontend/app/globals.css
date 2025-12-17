@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .glass-card {
+        @apply bg-white rounded-xl shadow-lg border border-slate-100;
+    }
+
+    .glass-effect {
+        @apply backdrop-blur-md bg-white/70;
+    }
+
+    .nav-link {
+        @apply px-4 py-2 text-slate-300 hover:text-white transition-colors duration-200 font-medium;
+    }
+
+    .nav-link-active {
+        @apply text-emerald-400 font-semibold border-b-2 border-emerald-400;
+    }
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Plotly overrides if needed */
+.js-plotly-plot .plotly .modebar {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+}
