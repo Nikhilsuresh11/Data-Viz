@@ -18,6 +18,11 @@ app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
 app.config['MAX_CONTENT_LENGTH'] = config.MAX_CONTENT_LENGTH
 
+# Session configuration for cross-origin requests (Vercel → Render)
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Allow cross-site cookies
+app.config['SESSION_COOKIE_SECURE'] = True      # Required for SameSite=None
+app.config['SESSION_COOKIE_HTTPONLY'] = True    # Security best practice
+
 # Enable CORS for Next.js frontend (development + production)
 allowed_origins = [
     "http://localhost:3000",

@@ -27,7 +27,7 @@ export default function Navbar() {
                         <Link href="/" className={isActive('/')}>Home</Link>
                         <Link href="/upload" className={isActive('/upload')}>Upload</Link>
                         <Link href="/overview" className={isActive('/overview')}>Overview</Link>
-                        <Link href="/explorer" className={isActive('/explorer')}>Explorer</Link>
+                        {/* <Link href="/explorer" className={isActive('/explorer')}>Explorer</Link> */}
                         <Link href="/visualize" className={isActive('/visualize')}>Visualize</Link>
                         <Link href="/chart-builder" className={isActive('/chart-builder')}>Chart Builder</Link>
                         <Link href="/insights" className={isActive('/insights')}>Insights</Link>
