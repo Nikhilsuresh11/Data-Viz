@@ -22,7 +22,7 @@ app.config['MAX_CONTENT_LENGTH'] = config.MAX_CONTENT_LENGTH
 allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://*.vercel.app",  # Allow all Vercel preview deployments
+    r"^https://portfolio-buzz.*\.vercel\.app$",  # Allow Vercel preview deployments
 ]
 CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
 
