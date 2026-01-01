@@ -37,9 +37,7 @@ export const api = {
         });
       }
 
-      const res = await apiClient.post('/api/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const res = await apiClient.post('/api/upload', formData);
       return res.data;
     } catch (error) {
       console.error("Error uploading file:", error);

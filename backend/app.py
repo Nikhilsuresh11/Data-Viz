@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, send_file, session
 from flask_cors import CORS
 import os
 import sys
+import re
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -27,7 +28,7 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True    # Security best practice
 allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    r"^https://data-viz.*\.vercel\.app$",  # Allow Vercel preview deployments
+    re.compile(r"^https://data-viz.*\.vercel\.app$"),  # Allow Vercel preview deployments
 ]
 CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
 
