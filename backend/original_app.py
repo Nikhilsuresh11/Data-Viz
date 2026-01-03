@@ -1,5 +1,5 @@
 # install requirements.txt 
-# TOGETHER_API_KEY = " " add in .env and you are good to go
+# GROQ_API_KEY = " " add in .env and you are good to go
 from flask import Flask, render_template, request, jsonify, send_file, session, redirect, url_for
 import pandas as pd
 import numpy as np
@@ -19,7 +19,7 @@ import time
 from sklearn.preprocessing import LabelEncoder
 import base64
 from datetime import datetime
-from together import Together
+from groq import Groq
 import asyncio
 import threading
 import tabula
@@ -35,12 +35,12 @@ app.secret_key = 'data_viz_secret_key'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 
-# Initialize Together API client
+# Initialize Groq API client
 try:
-    together_client = Together(api_key=os.environ.get('TOGETHER_API_KEY', ''))
+    groq_client = Groq(api_key=os.environ.get('GROQ_API_KEY', ''))
 except Exception as e:
-    print(f"Error initializing Together API: {str(e)}")
-    together_client = None
+    print(f"Error initializing Groq API: {str(e)}")
+    groq_client = None
 
 # Create uploads folder if it doesn't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -260,8 +260,8 @@ def generate_visualization_recommendations(df, column_types, stats, correlations
 # LLM-powered functions
 def generate_llm_insights(df, column_types, stats, correlations, potential_targets):
     """Generate insights using LLM"""
-    if not together_client:
-        return ["API key required for LLM insights. Please set the TOGETHER_API_KEY environment variable."]
+    if not groq_client:
+        return ["API key required for LLM insights. Please set the GROQ_API_KEY environment variable."]
     
     try:
         # Prepare dataset summary for the LLM
@@ -300,8 +300,8 @@ def generate_llm_insights(df, column_types, stats, correlations, potential_targe
         Format your response as a list of bullet points.
         """
         
-        response = together_client.chat.completions.create(
-            model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
+        response = groq_client.chat.completions.create(
+            model=os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile'),
             messages=[
                 {"role": "system", "content": "You are a data science expert who provides concise, insightful analysis."},
                 {"role": "user", "content": prompt}
@@ -309,7 +309,6 @@ def generate_llm_insights(df, column_types, stats, correlations, potential_targe
             max_tokens=800,
             temperature=0.5,
             top_p=0.7,
-            top_k=50
         )
         
         insights_text = response.choices[0].message.content
@@ -338,7 +337,7 @@ def generate_llm_insights(df, column_types, stats, correlations, potential_targe
 
 def generate_llm_chart_ideas(df, column_types):
     """Generate chart ideas using LLM"""
-    if not together_client:
+    if not groq_client:
         return []
     
     try:
@@ -373,8 +372,8 @@ def generate_llm_chart_ideas(df, column_types):
         Return a JSON array of these objects.
         """
         
-        response = together_client.chat.completions.create(
-            model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
+        response = groq_client.chat.completions.create(
+            model=os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile'),
             messages=[
                 {"role": "system", "content": "You are a data visualization expert who provides creative and insightful chart ideas."},
                 {"role": "user", "content": prompt}
@@ -382,7 +381,6 @@ def generate_llm_chart_ideas(df, column_types):
             max_tokens=1000,
             temperature=0.7,
             top_p=0.9,
-            top_k=50
         )
         
         chart_ideas_text = response.choices[0].message.content
@@ -421,8 +419,8 @@ def generate_llm_chart_ideas(df, column_types):
 
 def get_llm_response_for_chat(question, df_info):
     """Get LLM response for chat questions"""
-    if not together_client:
-        return "API key required for chat. Please set the TOGETHER_API_KEY environment variable."
+    if not groq_client:
+        return "API key required for chat. Please set the GROQ_API_KEY environment variable."
     
     try:
         prompt = f"""
@@ -436,8 +434,8 @@ def get_llm_response_for_chat(question, df_info):
         If you cannot answer based on the provided information, explain what additional data would be needed.
         """
         
-        response = together_client.chat.completions.create(
-            model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
+        response = groq_client.chat.completions.create(
+            model=os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile'),
             messages=[
                 {"role": "system", "content": "You are a helpful data analysis assistant who provides concise, accurate answers about datasets."},
                 {"role": "user", "content": prompt}
@@ -445,7 +443,6 @@ def get_llm_response_for_chat(question, df_info):
             max_tokens=500,
             temperature=0.3,
             top_p=0.9,
-            top_k=50
         )
         
         return response.choices[0].message.content
@@ -455,7 +452,7 @@ def get_llm_response_for_chat(question, df_info):
 
 def generate_llm_column_insights(df, column_name, column_type, stats):
     """Generate insights for a specific column using LLM"""
-    if not together_client:
+    if not groq_client:
         return "API key required for column insights."
     
     try:
@@ -492,8 +489,8 @@ def generate_llm_column_insights(df, column_name, column_type, stats):
         Format your response as a list of bullet points.
         """
         
-        response = together_client.chat.completions.create(
-            model="meta-llama/Llama-3.3-70B-Instruct-Turbo",
+        response = groq_client.chat.completions.create(
+            model=os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile'),
             messages=[
                 {"role": "system", "content": "You are a data analysis expert who provides concise, insightful analysis of dataset columns."},
                 {"role": "user", "content": prompt}
@@ -501,7 +498,6 @@ def generate_llm_column_insights(df, column_name, column_type, stats):
             max_tokens=500,
             temperature=0.5,
             top_p=0.7,
-            top_k=50
         )
         
         insights_text = response.choices[0].message.content

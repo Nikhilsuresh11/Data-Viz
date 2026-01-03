@@ -6,7 +6,7 @@ seaborn
 plotly
 scikit-learn
 Werkzeug
-together
+groq
 tabula-py
 PyPDF2
 python-docx

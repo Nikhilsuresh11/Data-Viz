@@ -33,7 +33,7 @@ Optimized Flask backend for Render free tier (512MB RAM) with lazy loading and m
 - `GET /api/recommendations` - Get visualization recommendations
 - `POST /api/chart/custom` - Create custom chart
 
-### LLM Features (requires TOGETHER_API_KEY)
+### LLM Features (requires GROQ_API_KEY)
 - `GET /api/insights` - Get LLM insights
 - `POST /api/chat` - Chat with LLM
 - `GET /api/column/<name>/insights` - Column-specific insights
@@ -46,7 +46,7 @@ Optimized Flask backend for Render free tier (512MB RAM) with lazy loading and m
 ## Environment Variables
 
 ```bash
-TOGETHER_API_KEY=your_api_key_here
+GROQ_API_KEY=your_api_key_here
 SECRET_KEY=your_secret_key
 MAX_ROWS_LIMIT=100000
 CHUNK_SIZE=10000

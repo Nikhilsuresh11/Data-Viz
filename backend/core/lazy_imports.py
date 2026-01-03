@@ -64,9 +64,9 @@ def get_sklearn_preprocessing():
     """Lazy load sklearn.preprocessing"""
     return _lazy_importer.import_module('sklearn.preprocessing')
 
-def get_together():
-    """Lazy load together AI client"""
-    return _lazy_importer.import_module('together')
+def get_groq():
+    """Lazy load groq client"""
+    return _lazy_importer.import_module('groq')
 
 def get_beautifulsoup():
     """Lazy load BeautifulSoup"""

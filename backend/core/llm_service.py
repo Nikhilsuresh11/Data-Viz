@@ -6,7 +6,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
-from core.lazy_imports import get_pandas, get_together
+from core.lazy_imports import get_pandas, get_groq
 from utils.memory_manager import cleanup_dataframe, MemoryMonitor
 from utils.config import config
 
@@ -20,8 +20,8 @@ def generate_llm_insights_lazy(file_path: str) -> list:
     Returns:
         list of insights
     """
-    if not config.has_together_api_key:
-        return ["API key required for LLM insights. Please set the TOGETHER_API_KEY environment variable."]
+    if not config.has_groq_api_key:
+        return ["API key required for LLM insights. Please set the GROQ_API_KEY environment variable."]
     
     with MemoryMonitor("LLM Insights"):
         pd = get_pandas()
@@ -72,7 +72,7 @@ def generate_llm_chart_ideas_lazy(file_path: str) -> list:
     Returns:
         list of chart ideas
     """
-    if not config.has_together_api_key:
+    if not config.has_groq_api_key:
         return []
     
     with MemoryMonitor("LLM Chart Ideas"):
@@ -113,8 +113,8 @@ def chat_with_llm_lazy(question: str, df_info: str) -> str:
     Returns:
         LLM response
     """
-    if not config.has_together_api_key:
-        return "API key required for chat. Please set the TOGETHER_API_KEY environment variable."
+    if not config.has_groq_api_key:
+        return "API key required for chat. Please set the GROQ_API_KEY environment variable."
     
     with MemoryMonitor("LLM Chat"):
         # Import original function
@@ -138,7 +138,7 @@ def get_column_insights_lazy(file_path: str, column: str) -> list:
     Returns:
         list of insights
     """
-    if not config.has_together_api_key:
+    if not config.has_groq_api_key:
         return ["API key required for column insights."]
     
     with MemoryMonitor("Column Insights"):
